@@ -2,21 +2,7 @@
 
 import { useState } from "react";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { PageEditorModal } from "./editor-modal";
-
-type Page = {
-  id: number;
-  title: string;
-  slug: string;
-  content: string | null;
-  metaTitle: string | null;
-  metaDescription: string | null;
-  status: string;
-  showInFooter: boolean;
-  sortOrder: number;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-};
+import { PageEditorModal, type Page } from "./editor-modal";
 
 interface Props { initialPages: Page[] }
 
@@ -48,8 +34,17 @@ export function AdminPagesClient({ initialPages }: Props) {
     <div className="max-w-[1100px] mx-auto px-6 py-7" style={{ animation: "fadeUp .35s ease both" }}>
       <AdminPageHeader
         title="Pages"
-        description="Manage static content pages (Terms, Privacy, DMCA, etc.)"
-        action={{ label: "New Page", onClick: () => setCreating(true) }}
+        subtitle="Manage static content pages (Terms, Privacy, DMCA, etc.)"
+        actions={
+          <button
+            type="button"
+            onClick={() => setCreating(true)}
+            className="rounded-xl px-4 py-2.5 text-[13.5px] font-bold text-white cursor-pointer border-none"
+            style={{ background: "linear-gradient(135deg, #ff2e63, #ff6a3d)" }}
+          >
+            New Page
+          </button>
+        }
       />
 
       {(creating || editingPage) && (

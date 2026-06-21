@@ -84,7 +84,10 @@ export function HeroCarousel({ wallpapers, prefix, labels: t }: HeroCarouselProp
       onTouchEnd={(e) => {
         if (touchStartX.current === null) return;
         const dx = e.changedTouches[0].clientX - touchStartX.current;
-        if (Math.abs(dx) > 50) { dx < 0 ? next() : back(); }
+        if (Math.abs(dx) > 50) {
+          if (dx < 0) next();
+          else back();
+        }
         touchStartX.current = null;
       }}
     >

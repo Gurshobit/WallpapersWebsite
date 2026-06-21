@@ -206,7 +206,7 @@ export function DownloadModal({
             className="w-[72px] h-[48px] rounded-[10px] overflow-hidden flex-none"
             style={{ border: "1px solid rgba(255,255,255,.08)" }}
           >
-            <img src={wallpaper.thumbUrl} alt={wallpaper.title} className="w-full h-full object-cover" />
+            <Image src={wallpaper.thumbUrl} alt={wallpaper.title} width={72} height={48} className="w-full h-full object-cover" unoptimized />
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-bold text-[15px] truncate leading-tight" style={{ fontFamily: "var(--font-heading)" }}>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { SITE_URL } from "@/lib/routing";
 import { formatCount } from "@/lib/format";
@@ -120,7 +121,7 @@ function FormatPickerModal({
           {thumbUrl && (
             <div className="w-[60px] h-[40px] rounded-[8px] overflow-hidden flex-none"
               style={{ border: "1px solid rgba(255,255,255,.08)" }}>
-              <img src={thumbUrl} alt={wallpaperTitle} className="w-full h-full object-cover" />
+              <Image src={thumbUrl} alt={wallpaperTitle} width={60} height={40} className="w-full h-full object-cover" unoptimized />
             </div>
           )}
           <div className="flex-1 min-w-0">

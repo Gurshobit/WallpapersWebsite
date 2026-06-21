@@ -16,7 +16,7 @@ export async function ensureWallpaperUuidColumn() {
     ) AS exists
   `);
 
-  const exists = Boolean(result.rows?.[0]?.exists ?? result[0]?.exists);
+  const exists = Boolean(result.rows?.[0]?.exists);
 
   if (exists) {
     console.log("uuid column already exists");

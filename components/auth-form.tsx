@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { signIn } from "@/lib/auth-client";
 import Link from "next/link";
 import Image from "next/image";
-import { Turnstile } from "@marsidev/react-turnstile";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { getTurnstileSiteKey, isTurnstileEnabled } from "@/lib/turnstile";
 
 type Tab = "login" | "signup";
@@ -35,7 +35,7 @@ export function AuthForm({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const turnstileRef = useRef<{ reset: () => void } | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
   const siteKey = getTurnstileSiteKey();
   const turnstileEnabled = isTurnstileEnabled();
 

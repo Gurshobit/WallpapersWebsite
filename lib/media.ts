@@ -1,7 +1,7 @@
 import { CDN_URL } from "./routing";
 
 /** CDN URLs are used by default. Enable proxy only when CDN is unavailable. */
-export function useMediaProxy(): boolean {
+export function isMediaProxyEnabled(): boolean {
   return process.env.NEXT_PUBLIC_USE_MEDIA_PROXY === "true";
 }
 
@@ -30,7 +30,7 @@ export function resolveMediaUrl(urlOrKey: string): string {
   const key = extractMediaKey(urlOrKey);
   if (!key) return urlOrKey;
 
-  if (useMediaProxy()) {
+  if (isMediaProxyEnabled()) {
     return `/api/media/${key}`;
   }
 

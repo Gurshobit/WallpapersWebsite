@@ -48,16 +48,7 @@ export function PreviewEditModal({ file, resolution, initialCrop, onApply, onClo
   const canvasW = Math.round(canvasH * targetAR);
 
   // Max zoom: max that keeps image covering canvas (capped at 4×)
-  const getMaxZoom = useCallback(() => {
-    const img = imgRef.current;
-    if (!img) return 4;
-    const srcAR = img.naturalWidth / img.naturalHeight;
-    const baseScale = srcAR > targetAR
-      ? canvasH / img.naturalHeight
-      : canvasW / img.naturalWidth;
-    // At zoom=4 the image is 4× over cover — reasonable upper limit
-    return 4;
-  }, [canvasH, canvasW, targetAR]);
+  const getMaxZoom = useCallback(() => 4, []);
 
   // Load image once
   useEffect(() => {

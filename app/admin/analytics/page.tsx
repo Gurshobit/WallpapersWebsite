@@ -11,6 +11,7 @@ const TYPE_META = {
   download: { label: "Downloaded", color: "#7fe6f5", bg: "rgba(34,211,238,.12)", icon: "M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5M3 19h18" },
   view:     { label: "Viewed",    color: "#b794f6", bg: "rgba(139,92,246,.12)", icon: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2Z M12 12m-3 0a3 3 0 1 0 6 0 3 3 0 0 0-6 0" },
   like:     { label: "Liked",     color: "#ff6a8a", bg: "rgba(255,46,99,.12)",  icon: "M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l8.84 8.84 8.84-8.84a5.5 5.5 0 0 0 0-7.78Z" },
+  upload:   { label: "Uploaded",  color: "#6ee7a0", bg: "rgba(48,164,108,.12)", icon: "M12 3v13m0 0 4.5-4.5M12 16l-4.5-4.5M3 19h18" },
 } as const;
 
 function timeAgo(date: Date | null) {

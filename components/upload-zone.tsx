@@ -638,7 +638,8 @@ export function UploadZone({
                             <div
                               onClick={(e) => {
                                 e.stopPropagation();
-                                state === "all" ? deselectAllInGroup(group) : selectAllInGroup(group);
+                                if (state === "all") deselectAllInGroup(group);
+                                else selectAllInGroup(group);
                               }}
                               className="w-[17px] h-[17px] rounded-[4px] flex items-center justify-center flex-none cursor-pointer"
                               style={{

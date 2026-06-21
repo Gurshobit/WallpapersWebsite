@@ -11,12 +11,14 @@ export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const [page] = await db.select().from(pages).where(and(eq(pages.slug, slug), eq(pages.status, "published"))).limit(1);
   if (!page) return {};
   return buildMetadata({
     title: page.metaTitle ?? page.title,
-    description: page.metaDescription ?? undefined,
+    description: page.metaDescription ?? page.title,
+    path: `/pages/${slug}`,
+    locale: locale as "en",
   });
 }
 

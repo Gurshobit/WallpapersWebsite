@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { RichTextEditor } from "@/components/rich-text-editor";
 
-type Page = {
+export type Page = {
   id: number;
   title: string;
   slug: string;
@@ -13,6 +13,8 @@ type Page = {
   status: string;
   showInFooter: boolean;
   sortOrder: number;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
 };
 
 interface Props {
