@@ -3,7 +3,6 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/session";
 import { db } from "@/lib/db";
 import { siteConfigs } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
 
 const patchSchema = z.object({
   configs: z.record(z.string(), z.string()),

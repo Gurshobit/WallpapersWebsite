@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { pages } from "@/lib/db/schema";
-import { asc, eq } from "drizzle-orm";
+import { asc } from "drizzle-orm";
 
 const schema = z.object({
   title: z.string().min(1).max(500),

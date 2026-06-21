@@ -361,7 +361,6 @@ const TYPE_COLORS = [
 
 function SortableTypeGroup({
   type,
-  allTypes,
   resolutions,
   colorIdx,
   onDeleteType,
@@ -374,7 +373,6 @@ function SortableTypeGroup({
   savingResIds,
 }: {
   type: ResolutionType;
-  allTypes: ResolutionType[];
   resolutions: Resolution[];
   colorIdx: number;
   onDeleteType: (id: number) => void;
@@ -839,7 +837,6 @@ export function AdminResolutionsManager({
                 <SortableTypeGroup
                   key={type.id}
                   type={type}
-                  allTypes={types}
                   resolutions={resMap[type.id] ?? []}
                   colorIdx={idx}
                   onDeleteType={deleteType}
