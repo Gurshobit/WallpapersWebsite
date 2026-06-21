@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/stats-rollup",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/sitemap",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/backfill-variants",
+      "schedule": "0 */6 * * *"
+    }
+  ]
+}
