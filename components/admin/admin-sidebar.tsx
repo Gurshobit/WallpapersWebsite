@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { AdminNavIcon, IconArrowLeft, type AdminNavIconKey } from "./admin-icons";
 import { AdminAppearanceToggle } from "./admin-appearance-toggle";
+import { PLATFORM_VERSION } from "@/lib/version";
 
 const NAV: {
   href: string;
@@ -52,7 +53,7 @@ export function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
             priority
           />
           <div className="text-[10px] tracking-[0.3px]" style={{ color: "var(--dim2)" }}>
-            Admin panel
+            Admin panel · v{PLATFORM_VERSION}
           </div>
         </div>
       </div>
