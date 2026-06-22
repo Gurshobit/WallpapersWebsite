@@ -1,6 +1,12 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { nextCookies } from "better-auth/next-js";
 import { db } from "./db";
+import {
+  getAuthBaseUrl,
+  getTrustedOrigins,
+  shouldUseSecureCookies,
+} from "./auth-url";
 import {
   authUser,
   authSession,
@@ -51,8 +57,13 @@ export const auth = betterAuth({
       enabled: Boolean(process.env.GITHUB_CLIENT_ID),
     },
   },
-  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
+  baseURL: getAuthBaseUrl(),
   secret: process.env.BETTER_AUTH_SECRET ?? "dev-secret-change-me",
+  trustedOrigins: getTrustedOrigins(),
+  advanced: {
+    useSecureCookies: shouldUseSecureCookies(),
+  },
+  plugins: [nextCookies()],
 });
 
 export type Session = typeof auth.$Infer.Session;

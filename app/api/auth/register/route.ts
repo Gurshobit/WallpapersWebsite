@@ -18,6 +18,7 @@ import {
   assertUsernameAllowed,
   getMemberSettings,
 } from "@/lib/member-settings";
+import { forwardAuthResponse } from "@/lib/auth-response";
 import { hashPasswordForStorage } from "@/lib/user-password";
 
 const schema = z.object({
@@ -116,7 +117,7 @@ export async function POST(req: NextRequest) {
       asResponse: true,
     });
 
-    return res;
+    return forwardAuthResponse(res);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Registration failed";
     const status =

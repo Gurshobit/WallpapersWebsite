@@ -8,6 +8,7 @@ import {
   syncAuthAccountFromUser,
   verifyUserPasswordByEmail,
 } from "@/lib/user-password";
+import { forwardAuthResponse } from "@/lib/auth-response";
 import { getMemberSettings } from "@/lib/member-settings";
 
 const schema = z.object({
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
       asResponse: true,
     });
 
-    return res;
+    return forwardAuthResponse(res);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Login failed";
     return NextResponse.json({ error: message }, { status: 400 });

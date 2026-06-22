@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { signIn } from "@/lib/auth-client";
+import { authClient, signIn } from "@/lib/auth-client";
 import Link from "next/link";
 import Image from "next/image";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
@@ -65,6 +65,7 @@ export function AuthForm({
       if (tab === "login") {
         const loginRes = await fetch("/api/auth/login", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
         });
@@ -78,6 +79,7 @@ export function AuthForm({
         if (!agree) throw new Error("Please agree to the terms");
         const registerRes = await fetch("/api/auth/register", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password, username }),
         });
@@ -89,6 +91,7 @@ export function AuthForm({
           return;
         }
       }
+      await authClient.getSession();
       router.push(prefix || "/");
       router.refresh();
     } catch (err) {
