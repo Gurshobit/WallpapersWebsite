@@ -1,31 +1,32 @@
-import DOMPurify from "isomorphic-dompurify";
+import "server-only";
+import sanitizeHtmlLib from "sanitize-html";
 
-const ALLOWED_TAGS = [
-  "p", "br", "strong", "em", "u", "s", "code", "pre",
-  "h1", "h2", "h3", "ul", "ol", "li", "blockquote", "hr", "a", "span",
-];
-
-const ALLOWED_ATTR = ["href", "target", "rel", "class", "style"];
-
-/** Sanitize rich-text HTML for safe rendering. */
+/**
+ * Server-side rich-text sanitizer for HTML produced by the RichTextEditor.
+ * Uses sanitize-html (htmlparser2-based, no jsdom) so it runs reliably in
+ * serverless/edge Node runtimes. Do NOT import this from client components —
+ * use `stripHtml` from `lib/html-text` for plain-text needs on the client.
+ */
 export function sanitizeHtml(html: string | null | undefined): string {
   if (!html) return "";
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
+  return sanitizeHtmlLib(html, {
+    allowedTags: [
+      "p", "br", "strong", "em", "u", "s", "code", "pre",
+      "h1", "h2", "h3", "ul", "ol", "li", "blockquote", "hr", "a", "span",
+    ],
+    allowedAttributes: {
+      a: ["href", "target", "rel"],
+      span: ["class"],
+      "*": ["style"],
+    },
+    allowedSchemes: ["http", "https", "mailto", "tel"],
+    transformTags: {
+      a: sanitizeHtmlLib.simpleTransform("a", {
+        rel: "noopener noreferrer nofollow",
+        target: "_blank",
+      }),
+    },
   });
 }
 
-/** Strip all HTML down to plain text (for meta descriptions, JSON-LD, previews). */
-export function stripHtml(html: string | null | undefined): string {
-  if (!html) return "";
-  const text = DOMPurify.sanitize(html, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
-  return text
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+export { stripHtml } from "./html-text";

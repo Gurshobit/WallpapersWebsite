@@ -6,7 +6,7 @@ import { useState, useTransition } from "react";
 import type { CollectionListItem, CollectionSort } from "@/lib/db/queries/collections";
 import { collectionThumbSrc } from "@/lib/collection-ui";
 import { formatCount } from "@/lib/format";
-import { stripHtml } from "@/lib/sanitize";
+import { stripHtml } from "@/lib/html-text";
 import { CreateCollectionButton } from "./create-collection-button";
 
 export function CollectionsView({

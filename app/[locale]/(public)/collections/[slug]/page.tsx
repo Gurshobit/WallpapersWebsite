@@ -9,7 +9,8 @@ import { collectionThumbSrc } from "@/lib/collection-ui";
 import { formatCount } from "@/lib/format";
 import { CollectionSaveButton } from "@/components/collections/collection-save-button";
 import { RichContent } from "@/components/rich-content";
-import { stripHtml } from "@/lib/sanitize";
+import { sanitizeHtml } from "@/lib/sanitize";
+import { stripHtml } from "@/lib/html-text";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +73,7 @@ export default async function CollectionDetailPage({
             {collection.name}
           </h1>
           {collection.description && (
-            <RichContent html={collection.description} className="rte-prose rte-prose-sm max-w-2xl" />
+            <RichContent html={sanitizeHtml(collection.description)} className="rte-prose rte-prose-sm max-w-2xl" />
           )}
           <div className="flex flex-wrap items-center gap-4 mt-4 text-sm" style={{ color: "var(--dim)" }}>
             <Link href={`${prefix}/u/${curatorUsername}`} className="inline-flex items-center gap-2 no-underline font-semibold" style={{ color: "var(--text2)" }}>

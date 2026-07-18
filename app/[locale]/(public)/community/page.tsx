@@ -11,6 +11,7 @@ import {
 } from "@/lib/db/queries/community";
 import { getCurrentUser } from "@/lib/session";
 import { getMemberSettings } from "@/lib/member-settings";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +62,7 @@ export default async function CommunityPage({
         stats={stats}
         feed={feed}
         creators={creators}
-        challenges={challenges}
+        challenges={challenges.map((c) => ({ ...c, description: sanitizeHtml(c.description) }))}
         featuredCollections={featuredCollections}
         isLoggedIn={Boolean(user)}
         canSubmit={canSubmit}

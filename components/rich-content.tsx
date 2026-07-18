@@ -1,8 +1,9 @@
-import { sanitizeHtml } from "@/lib/sanitize";
-
 /**
- * Renders sanitized rich-text HTML produced by the RichTextEditor.
- * Safe to use in both server and client components.
+ * Renders rich-text HTML produced by the RichTextEditor.
+ *
+ * IMPORTANT: `html` must already be sanitized (via `sanitizeHtml` from
+ * `lib/sanitize`, on the server). This component is a dumb renderer with no
+ * dependencies so it is safe to use in both server and client components.
  */
 export function RichContent({
   html,
@@ -13,13 +14,12 @@ export function RichContent({
   className?: string;
   style?: React.CSSProperties;
 }) {
-  const clean = sanitizeHtml(html);
-  if (!clean.trim()) return null;
+  if (!html || !html.trim()) return null;
   return (
     <div
       className={className}
       style={style}
-      dangerouslySetInnerHTML={{ __html: clean }}
+      dangerouslySetInnerHTML={{ __html: html }}
     />
   );
 }

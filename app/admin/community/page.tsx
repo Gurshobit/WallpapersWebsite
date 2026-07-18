@@ -2,6 +2,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminCommunityPanel } from "@/components/admin/admin-community-panel";
 import { getCommunityFeed, listChallenges } from "@/lib/db/queries/community";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export default async function AdminCommunityPage() {
         challenges={challenges.map((c) => ({
           id: c.id,
           title: c.title,
-          description: c.description,
+          description: sanitizeHtml(c.description),
           accentColor: c.accentColor,
           prize: c.prize,
           entryCount: c.entryCount,

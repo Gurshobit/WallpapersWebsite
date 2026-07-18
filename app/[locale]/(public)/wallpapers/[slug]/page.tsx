@@ -15,7 +15,8 @@ import {
 import { getMemberSettings } from "@/lib/member-settings";
 import { getCurrentUser } from "@/lib/session";
 import { RichContent } from "@/components/rich-content";
-import { stripHtml } from "@/lib/sanitize";
+import { sanitizeHtml } from "@/lib/sanitize";
+import { stripHtml } from "@/lib/html-text";
 
 export const dynamic = "force-dynamic";
 
@@ -165,7 +166,7 @@ export default async function WallpaperDetailPage({
             wallpaperUuid={wallpaper.uuid}
             slug={slug}
             title={wallpaper.title}
-            description={wallpaper.description}
+            description={sanitizeHtml(wallpaper.description)}
             categoryName={category.name}
             licenseName={license.name}
             licenseUrl={license.url}
@@ -229,7 +230,7 @@ export default async function WallpaperDetailPage({
                           {c.dateAdded?.toLocaleDateString()}
                         </span>
                       </div>
-                      <RichContent html={c.message} className="rte-prose rte-prose-sm" />
+                      <RichContent html={sanitizeHtml(c.message)} className="rte-prose rte-prose-sm" />
                     </li>
                   ))}
                 </ul>

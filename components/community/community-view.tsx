@@ -9,7 +9,7 @@ import { formatCount } from "@/lib/format";
 import { resolveMediaUrl } from "@/lib/media";
 import { FollowButton } from "@/components/follow-button";
 import { RichContent } from "@/components/rich-content";
-import { stripHtml } from "@/lib/sanitize";
+import { stripHtml } from "@/lib/html-text";
 
 type Creator = {
   id: number;

@@ -16,6 +16,7 @@ import { ProfileStatCards } from "@/components/profile-stat-cards";
 import { ProfileCollectionsGrid } from "@/components/profile-collections-grid";
 import { FollowButton } from "@/components/follow-button";
 import { RichContent } from "@/components/rich-content";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { buildMetadata } from "@/lib/seo";
 import { getCurrentUser } from "@/lib/session";
 import { getMemberSettings } from "@/lib/member-settings";
@@ -218,7 +219,7 @@ export default async function ProfilePage({
 
         {privacy?.viewBio !== "only_me" && profile?.biography && (
           <RichContent
-            html={profile.biography}
+            html={sanitizeHtml(profile.biography)}
             className="rte-prose rte-prose-sm max-w-[560px] mt-[18px] mx-2"
           />
         )}
