@@ -14,6 +14,8 @@ import {
 } from "@/lib/db/queries/wallpapers";
 import { getMemberSettings } from "@/lib/member-settings";
 import { getCurrentUser } from "@/lib/session";
+import { RichContent } from "@/components/rich-content";
+import { stripHtml } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +32,7 @@ export async function generateMetadata({
   return buildMetadata({
     title: `${wallpaper.title} — Free ${category.name} Wallpaper`,
     description:
-      wallpaper.description ??
+      stripHtml(wallpaper.description) ||
       `Download ${wallpaper.title} wallpaper in HD and 4K resolutions.`,
     path: `/wallpapers/${slug}`,
     locale: locale as "en",
@@ -63,7 +65,7 @@ export default async function WallpaperDetailPage({
 
   const jsonLd = wallpaperJsonLd({
     title: wallpaper.title,
-    description: wallpaper.description,
+    description: stripHtml(wallpaper.description) || null,
     contentUrl: wallpaperVariantUrl(wallpaper.uuid, 1920, 1080, "jpeg"),
     width: wallpaper.width,
     height: wallpaper.height,
@@ -227,7 +229,7 @@ export default async function WallpaperDetailPage({
                           {c.dateAdded?.toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-sm" style={{ color: "var(--text3)" }}>{c.message}</p>
+                      <RichContent html={c.message} className="rte-prose rte-prose-sm" />
                     </li>
                   ))}
                 </ul>

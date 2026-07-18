@@ -168,7 +168,10 @@
     "newPassword": "New password",
     "confirmPassword": "Confirm new password",
     "minPassword": "Min 8 characters",
-    "changePasswordBtn": "Change password"
+    "changePasswordBtn": "Change password",
+    "saved": "Settings saved",
+    "currentEmail": "Current email",
+    "passwordMismatch": "Passwords do not match"
   },
   "upload": {
     "pageTitle": "Upload a wallpaper",

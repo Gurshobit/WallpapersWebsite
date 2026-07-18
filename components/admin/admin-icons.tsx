@@ -201,10 +201,35 @@ export function IconPages(props: IconProps) {
   );
 }
 
+export function IconCollections(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path
+        d="M5 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17l-7-4-7 4V4z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </Icon>
+  );
+}
+
+export function IconCommunity(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="2" />
+      <path d="M3 20c0-3 2.5-5 6-5s6 2 6 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M16 3.5a3 3 0 0 1 0 6M21 20c0-2.5-1.5-4-4-4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </Icon>
+  );
+}
+
 export type AdminNavIconKey =
   | "dashboard"
   | "moderation"
   | "wallpapers"
+  | "collections"
+  | "community"
   | "users"
   | "members"
   | "categories"
@@ -214,12 +239,15 @@ export type AdminNavIconKey =
   | "licenses"
   | "pages"
   | "ads"
+  | "languages"
   | "settings";
 
 const NAV_ICON_MAP = {
   dashboard: IconDashboard,
   moderation: IconModeration,
   wallpapers: IconWallpapers,
+  collections: IconCollections,
+  community: IconCommunity,
   users: IconUsers,
   members: IconMembers,
   categories: IconCategories,
@@ -229,6 +257,7 @@ const NAV_ICON_MAP = {
   licenses: IconLicenses,
   pages: IconPages,
   ads: IconAds,
+  languages: IconLanguages,
   settings: IconSettings,
 } as const;
 

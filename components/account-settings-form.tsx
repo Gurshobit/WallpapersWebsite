@@ -3,20 +3,42 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
+import type { AccountSettings, PrivacyLevel } from "@/lib/db/queries/account";
+import { RichTextEditor } from "@/components/rich-text-editor";
 
 type SettingsTab = "profile" | "privacy" | "notifications" | "password";
+
+const PRIVACY_OPTIONS: { value: PrivacyLevel; label: string }[] = [
+  { value: "everyone", label: "Everyone" },
+  { value: "logged_members", label: "Members" },
+  { value: "only_me", label: "Only me" },
+];
 
 export function AccountSettingsForm({
   username,
   handle,
+  initial,
 }: {
   username: string;
   handle: string;
+  initial: AccountSettings;
 }) {
   const t = useTranslations("settings");
   const locale = useLocale();
   const prefix = locale === "en" ? "" : `/${locale}`;
   const [tab, setTab] = useState<SettingsTab>("profile");
+  const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const [profile, setProfile] = useState(initial.profile);
+  const [privacy, setPrivacy] = useState(initial.privacy);
+  const [notifications, setNotifications] = useState(initial.notifications);
+
+  const [newEmail, setNewEmail] = useState("");
+  const [emailPassword, setEmailPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const tabs: { key: SettingsTab; label: string }[] = [
     { key: "profile", label: t("tabProfile") },
@@ -33,6 +55,29 @@ export function AccountSettingsForm({
           fontWeight: 700,
         }
       : { color: "var(--muted)", fontWeight: 600, background: "transparent" };
+
+  async function patch(body: Record<string, unknown>) {
+    setSaving(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/account/settings", {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error ?? "Update failed");
+      setMessage({ type: "ok", text: t("saved") });
+    } catch (err) {
+      setMessage({
+        type: "err",
+        text: err instanceof Error ? err.message : "Update failed",
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="min-h-screen pb-20" style={{ background: "var(--bg)" }}>
@@ -55,6 +100,15 @@ export function AccountSettingsForm({
           {t("title")}
         </h1>
 
+        {message && (
+          <p
+            className="text-sm mb-4"
+            style={{ color: message.type === "ok" ? "#30a46c" : "#e5484d" }}
+          >
+            {message.text}
+          </p>
+        )}
+
         <div
           className="flex gap-0.5 rounded-xl p-1 mb-6 overflow-x-auto"
           style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
@@ -63,7 +117,10 @@ export function AccountSettingsForm({
             <button
               key={key}
               type="button"
-              onClick={() => setTab(key)}
+              onClick={() => {
+                setTab(key);
+                setMessage(null);
+              }}
               className="flex-none px-4 py-2.5 rounded-[10px] text-sm border-none cursor-pointer whitespace-nowrap"
               style={tabBtn(key)}
             >
@@ -78,25 +135,77 @@ export function AccountSettingsForm({
             style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <Field label={t("firstName")} />
-              <Field label={t("lastName")} />
+              <Field
+                label={t("firstName")}
+                value={profile.firstName}
+                onChange={(v) => setProfile((p) => ({ ...p, firstName: v }))}
+              />
+              <Field
+                label={t("lastName")}
+                value={profile.lastName}
+                onChange={(v) => setProfile((p) => ({ ...p, lastName: v }))}
+              />
             </div>
-            <Field label={t("nickname")} defaultValue={username} />
+            <Field
+              label={t("nickname")}
+              value={profile.nickname || username}
+              onChange={(v) => setProfile((p) => ({ ...p, nickname: v }))}
+            />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <Field label="Twitter / X" placeholder="@handle" />
-              <Field label="Facebook" placeholder="Profile URL" />
-              <Field label={t("homepage")} placeholder="https://…" />
-              <Field label="LinkedIn" placeholder="Profile URL" />
-              <Field label={t("location")} placeholder="City, Country" />
-              <Field label={t("interests")} placeholder="Photography, Travel…" />
+              <Field
+                label="Twitter / X"
+                placeholder="@handle"
+                value={profile.urlTwitter}
+                onChange={(v) => setProfile((p) => ({ ...p, urlTwitter: v }))}
+              />
+              <Field
+                label="Facebook"
+                placeholder="Profile URL"
+                value={profile.urlFacebook}
+                onChange={(v) => setProfile((p) => ({ ...p, urlFacebook: v }))}
+              />
+              <Field
+                label={t("homepage")}
+                placeholder="https://…"
+                value={profile.urlHomepage}
+                onChange={(v) => setProfile((p) => ({ ...p, urlHomepage: v }))}
+              />
+              <Field
+                label="LinkedIn"
+                placeholder="Profile URL"
+                value={profile.urlLinkedin}
+                onChange={(v) => setProfile((p) => ({ ...p, urlLinkedin: v }))}
+              />
+              <Field
+                label={t("location")}
+                placeholder="City, Country"
+                value={profile.location}
+                onChange={(v) => setProfile((p) => ({ ...p, location: v }))}
+              />
+              <Field
+                label={t("interests")}
+                placeholder="Photography, Travel…"
+                value={profile.interests}
+                onChange={(v) => setProfile((p) => ({ ...p, interests: v }))}
+              />
             </div>
             <div>
               <label className="block text-xs font-semibold mb-[7px]" style={{ color: "var(--muted)" }}>
                 {t("aboutMe")}
               </label>
-              <textarea rows={4} className="hd-field resize-y" />
+              <RichTextEditor
+                content={profile.biography}
+                onChange={(html) => setProfile((p) => ({ ...p, biography: html }))}
+                placeholder={t("aboutMe")}
+                minHeight={160}
+              />
             </div>
-            <button type="button" className="hd-btn-primary self-start px-6 py-3 text-sm">
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => patch({ section: "profile", ...profile })}
+              className="hd-btn-primary self-start px-6 py-3 text-sm disabled:opacity-60"
+            >
               {t("updateProfile")}
             </button>
           </div>
@@ -107,15 +216,37 @@ export function AccountSettingsForm({
             className="rounded-2xl p-6 flex flex-col gap-4"
             style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
           >
-            <ToggleRow title={t("showAuthor")} subtitle={t("showAuthorHint")} defaultOn />
+            <ToggleRow
+              title={t("showAuthor")}
+              subtitle={t("showAuthorHint")}
+              on={privacy.showAuthor}
+              onChange={(v) => setPrivacy((p) => ({ ...p, showAuthor: v }))}
+            />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[t("viewProfile"), t("viewContact"), t("viewBio"), t("viewDownloads"), t("viewFavourites"), t("viewWallpapers")].map(
-                (label) => (
-                  <PrivacySelect key={label} label={label} />
-                )
-              )}
+              {(
+                [
+                  ["viewProfile", "viewProfile"],
+                  ["viewContactInfo", "viewContact"],
+                  ["viewBio", "viewBio"],
+                  ["viewDownloads", "viewDownloads"],
+                  ["viewFavourites", "viewFavourites"],
+                  ["viewWallpapers", "viewWallpapers"],
+                ] as const
+              ).map(([key, labelKey]) => (
+                <PrivacySelect
+                  key={key}
+                  label={t(labelKey)}
+                  value={privacy[key]}
+                  onChange={(v) => setPrivacy((p) => ({ ...p, [key]: v }))}
+                />
+              ))}
             </div>
-            <button type="button" className="hd-btn-primary self-start px-6 py-3 text-sm">
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => patch({ section: "privacy", ...privacy })}
+              className="hd-btn-primary self-start px-6 py-3 text-sm disabled:opacity-60"
+            >
               {t("updatePrivacy")}
             </button>
           </div>
@@ -126,10 +257,32 @@ export function AccountSettingsForm({
             className="rounded-2xl p-6"
             style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
           >
-            <ToggleRow title={t("commentNotif")} subtitle={t("commentNotifHint")} defaultOn />
-            <ToggleRow title={t("statusNotif")} subtitle={t("statusNotifHint")} defaultOn border />
-            <ToggleRow title={t("followerNotif")} subtitle={t("followerNotifHint")} border={false} />
-            <button type="button" className="hd-btn-primary mt-4 px-6 py-3 text-sm">
+            <ToggleRow
+              title={t("commentNotif")}
+              subtitle={t("commentNotifHint")}
+              on={notifications.emailOnComment}
+              onChange={(v) => setNotifications((n) => ({ ...n, emailOnComment: v }))}
+            />
+            <ToggleRow
+              title={t("statusNotif")}
+              subtitle={t("statusNotifHint")}
+              on={notifications.emailOnLike}
+              onChange={(v) => setNotifications((n) => ({ ...n, emailOnLike: v }))}
+              border
+            />
+            <ToggleRow
+              title={t("followerNotif")}
+              subtitle={t("followerNotifHint")}
+              on={notifications.emailOnFollow}
+              onChange={(v) => setNotifications((n) => ({ ...n, emailOnFollow: v }))}
+              border={false}
+            />
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => patch({ section: "notifications", ...notifications })}
+              className="hd-btn-primary mt-4 px-6 py-3 text-sm disabled:opacity-60"
+            >
               {t("updateNotifications")}
             </button>
           </div>
@@ -138,17 +291,73 @@ export function AccountSettingsForm({
         {tab === "password" && (
           <div className="flex flex-col gap-3.5">
             <Card title={t("changeEmail")}>
-              <Field label={t("newEmail")} type="email" placeholder="new@example.com" />
-              <Field label={t("currentPassword")} type="password" />
-              <button type="button" className="hd-btn-secondary self-start px-[18px] py-2.5 text-[13.5px]">
+              <p className="text-xs -mt-1 mb-1" style={{ color: "var(--dim)" }}>
+                {t("currentEmail")}: {initial.email}
+              </p>
+              <Field
+                label={t("newEmail")}
+                type="email"
+                placeholder="new@example.com"
+                value={newEmail}
+                onChange={setNewEmail}
+              />
+              <Field
+                label={t("currentPassword")}
+                type="password"
+                value={emailPassword}
+                onChange={setEmailPassword}
+              />
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() =>
+                  patch({
+                    section: "email",
+                    newEmail,
+                    currentPassword: emailPassword,
+                  })
+                }
+                className="hd-btn-secondary self-start px-[18px] py-2.5 text-[13.5px] disabled:opacity-60"
+              >
                 {t("updateEmail")}
               </button>
             </Card>
             <Card title={t("changePassword")}>
-              <Field label={t("currentPassword")} type="password" />
-              <Field label={t("newPassword")} type="password" placeholder={t("minPassword")} />
-              <Field label={t("confirmPassword")} type="password" />
-              <button type="button" className="hd-btn-primary self-start px-6 py-3 text-sm">
+              <Field
+                label={t("currentPassword")}
+                type="password"
+                value={currentPassword}
+                onChange={setCurrentPassword}
+              />
+              <Field
+                label={t("newPassword")}
+                type="password"
+                placeholder={t("minPassword")}
+                value={newPassword}
+                onChange={setNewPassword}
+              />
+              <Field
+                label={t("confirmPassword")}
+                type="password"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+              />
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => {
+                  if (newPassword !== confirmPassword) {
+                    setMessage({ type: "err", text: t("passwordMismatch") });
+                    return;
+                  }
+                  patch({
+                    section: "password",
+                    currentPassword,
+                    newPassword,
+                  });
+                }}
+                className="hd-btn-primary self-start px-6 py-3 text-sm disabled:opacity-60"
+              >
                 {t("changePasswordBtn")}
               </button>
             </Card>
@@ -163,12 +372,14 @@ function Field({
   label,
   type = "text",
   placeholder,
-  defaultValue,
+  value,
+  onChange,
 }: {
   label: string;
   type?: string;
   placeholder?: string;
-  defaultValue?: string;
+  value: string;
+  onChange: (value: string) => void;
 }) {
   return (
     <div>
@@ -177,7 +388,8 @@ function Field({
       </label>
       <input
         type={type}
-        defaultValue={defaultValue}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="hd-field"
       />
@@ -202,15 +414,16 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 function ToggleRow({
   title,
   subtitle,
-  defaultOn = false,
+  on,
+  onChange,
   border = true,
 }: {
   title: string;
   subtitle: string;
-  defaultOn?: boolean;
+  on: boolean;
+  onChange: (value: boolean) => void;
   border?: boolean;
 }) {
-  const [on, setOn] = useState(defaultOn);
   return (
     <div
       className={`flex items-center justify-between py-4 ${border ? "border-b" : ""}`}
@@ -224,7 +437,7 @@ function ToggleRow({
       </div>
       <button
         type="button"
-        onClick={() => setOn(!on)}
+        onClick={() => onChange(!on)}
         className="w-[42px] h-6 rounded-full border-none cursor-pointer relative transition-colors flex-none"
         style={{ background: on ? "#30a46c" : "var(--track)" }}
         aria-pressed={on}
@@ -238,17 +451,31 @@ function ToggleRow({
   );
 }
 
-function PrivacySelect({ label }: { label: string }) {
+function PrivacySelect({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: PrivacyLevel;
+  onChange: (value: PrivacyLevel) => void;
+}) {
   return (
     <div
       className="rounded-xl p-3.5"
       style={{ background: "var(--surface2)", border: "1px solid var(--line)" }}
     >
       <div className="text-[13.5px] font-semibold mb-2">{label}</div>
-      <select className="w-full rounded-lg px-2.5 py-2 text-[13px] outline-none hd-field">
-        <option>Everyone</option>
-        <option>Followers</option>
-        <option>Only me</option>
+      <select
+        className="w-full rounded-lg px-2.5 py-2 text-[13px] outline-none hd-field"
+        value={value}
+        onChange={(e) => onChange(e.target.value as PrivacyLevel)}
+      >
+        {PRIVACY_OPTIONS.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
       </select>
     </div>
   );

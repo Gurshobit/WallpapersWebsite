@@ -156,7 +156,10 @@
     "newPassword": "Nouveau mot de passe",
     "confirmPassword": "Confirmer le nouveau mot de passe",
     "minPassword": "Minimum 8 caractères",
-    "changePasswordBtn": "Modifier le mot de passe"
+    "changePasswordBtn": "Modifier le mot de passe",
+    "saved": "Settings saved",
+    "currentEmail": "Current email",
+    "passwordMismatch": "Passwords do not match"
   },
   "upload": {
     "pageTitle": "Téléverser un fond d'écran",

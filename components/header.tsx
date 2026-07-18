@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
@@ -10,6 +9,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { LocaleSwitcher } from "./locale-switcher";
 import { HeaderSearch } from "./header-search";
 import { ShortlistBadge } from "./shortlist-badge";
+import { SiteLogo } from "./site-logo";
 
 function NavIcon({ d }: { d: string }) {
   return (
@@ -85,8 +85,7 @@ export function Header({
 
           {/* Logo */}
           <Link href={prefix || "/"} className="flex items-center flex-none">
-            <Image src="/assets/logo.png" alt="HD Wallpapers" width={140} height={35}
-              className="site-logo h-[32px] sm:h-[36px] w-auto" priority />
+            <SiteLogo height={36} className="h-[32px] sm:h-[36px] w-auto" priority />
           </Link>
 
           {/* Desktop nav */}
@@ -208,8 +207,7 @@ export function Header({
         {/* Drawer header */}
         <div className="flex items-center justify-between px-5 py-4 flex-none"
           style={{ borderBottom: "1px solid var(--line)" }}>
-          <Image src="/assets/logo.png" alt="HD Wallpapers" width={120} height={30}
-            className="site-logo h-[28px] w-auto" />
+          <SiteLogo height={28} className="h-[28px] w-auto" />
           <button
             type="button"
             onClick={() => setMobileOpen(false)}

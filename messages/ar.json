@@ -156,7 +156,10 @@
     "newPassword": "كلمة مرور جديدة",
     "confirmPassword": "تأكيد كلمة المرور الجديدة",
     "minPassword": "8 أحرف على الأقل",
-    "changePasswordBtn": "تغيير كلمة المرور"
+    "changePasswordBtn": "تغيير كلمة المرور",
+    "saved": "Settings saved",
+    "currentEmail": "Current email",
+    "passwordMismatch": "Passwords do not match"
   },
   "upload": {
     "pageTitle": "رفع خلفية",

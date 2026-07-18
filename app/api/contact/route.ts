@@ -3,6 +3,7 @@ import { z } from "zod";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { getContactEmail } from "@/lib/contact";
 import { sendContactEmail } from "@/lib/email";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
       name: parsed.data.name,
       email: parsed.data.email,
       website: parsed.data.website || undefined,
-      message: parsed.data.message,
+      message: sanitizeHtml(parsed.data.message),
       ip: ip || undefined,
     });
 

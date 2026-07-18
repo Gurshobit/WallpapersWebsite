@@ -3,11 +3,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { getUserByUsername } from "@/lib/db/queries/users";
-import { listWallpapers } from "@/lib/db/queries/wallpapers";
+import {
+  getLikedWallpaperIds,
+  listWallpapers,
+} from "@/lib/db/queries/wallpapers";
+import { listCollectionsByUser } from "@/lib/db/queries/collections";
+import { isFollowing } from "@/lib/db/queries/follows";
 import { WallpaperGrid } from "@/components/wallpaper-card";
 import { Pagination } from "@/components/pagination";
 import { ProfileTabs, type ProfileTab } from "@/components/profile-tabs";
 import { ProfileStatCards } from "@/components/profile-stat-cards";
+import { ProfileCollectionsGrid } from "@/components/profile-collections-grid";
+import { FollowButton } from "@/components/follow-button";
+import { RichContent } from "@/components/rich-content";
 import { buildMetadata } from "@/lib/seo";
 import { getCurrentUser } from "@/lib/session";
 import { getMemberSettings } from "@/lib/member-settings";
@@ -59,10 +67,36 @@ export default async function ProfilePage({
     );
   }
 
-  const result =
-    tab === "uploads"
-      ? await listWallpapers({ userId: user.id, page, pageSize: profilesPerPage })
-      : { items: [], page: 1, totalPages: 0, total: 0 };
+  const canViewFavourites =
+    isOwner ||
+    !privacy?.viewFavourites ||
+    privacy.viewFavourites === "everyone" ||
+    (privacy.viewFavourites === "logged_members" && Boolean(currentUser));
+
+  let result = { items: [] as Awaited<ReturnType<typeof listWallpapers>>["items"], page: 1, totalPages: 0, total: 0 };
+  let userCollections: Awaited<ReturnType<typeof listCollectionsByUser>> = [];
+
+  if (tab === "uploads") {
+    result = await listWallpapers({
+      userId: user.id,
+      page,
+      pageSize: profilesPerPage,
+    });
+  } else if (tab === "liked" && canViewFavourites) {
+    const likedIds = await getLikedWallpaperIds(user.id);
+    result = await listWallpapers({
+      wallpaperIds: likedIds,
+      page,
+      pageSize: profilesPerPage,
+    });
+  } else if (tab === "collections") {
+    userCollections = await listCollectionsByUser(user.id, currentUser?.id);
+  }
+
+  const following =
+    currentUser && !isOwner
+      ? await isFollowing(currentUser.id, user.id)
+      : false;
 
   const displayName = profile?.nickname ?? user.username;
   const initials = displayName.slice(0, 2).toUpperCase();
@@ -148,51 +182,45 @@ export default async function ProfilePage({
             </div>
           </div>
 
-          {isOwner && (
-            <div className="flex gap-2.5 pb-2">
-              <Link
-                href={`${prefix}/settings`}
-                className="rounded-[11px] px-[18px] py-[11px] text-sm font-bold no-underline"
-                style={{
-                  background: "var(--line)",
-                  border: "1px solid var(--line2)",
-                  color: "var(--text)",
-                }}
-              >
-                {t("accountSettings")}
-              </Link>
-              <Link
-                href={`${prefix}/upload`}
-                className="hd-btn-primary flex items-center gap-[7px] rounded-[11px] px-[18px] py-[11px] text-sm font-bold text-white no-underline"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 16V4m0 0 5 5m-5-5L7 9"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                {t("uploadWallpaper")}
-              </Link>
-            </div>
-          )}
+          <div className="flex gap-2.5 pb-2">
+            {!isOwner && (
+              <FollowButton
+                handle={user.username}
+                initialFollowing={following}
+                isLoggedIn={Boolean(currentUser)}
+                isOwnProfile={false}
+                loginHref={`${prefix}/login`}
+              />
+            )}
+            {isOwner && (
+              <>
+                <Link
+                  href={`${prefix}/settings`}
+                  className="rounded-[11px] px-[18px] py-[11px] text-sm font-bold no-underline"
+                  style={{
+                    background: "var(--line)",
+                    border: "1px solid var(--line2)",
+                    color: "var(--text)",
+                  }}
+                >
+                  {t("accountSettings")}
+                </Link>
+                <Link
+                  href={`${prefix}/upload`}
+                  className="hd-btn-primary flex items-center gap-[7px] rounded-[11px] px-[18px] py-[11px] text-sm font-bold text-white no-underline"
+                >
+                  {t("uploadWallpaper")}
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         {privacy?.viewBio !== "only_me" && profile?.biography && (
-          <p
-            className="text-[14.5px] leading-relaxed max-w-[560px] mt-[18px] mx-2"
-            style={{ color: "var(--text3)" }}
-          >
-            {profile.biography}
-          </p>
+          <RichContent
+            html={profile.biography}
+            className="rte-prose rte-prose-sm max-w-[560px] mt-[18px] mx-2"
+          />
         )}
 
         <ProfileStatCards
@@ -204,7 +232,7 @@ export default async function ProfilePage({
 
         <ProfileTabs handle={handle} active={tab} />
 
-        {tab === "uploads" ? (
+        {tab === "uploads" && (
           <>
             <div className="px-2">
               <WallpaperGrid items={result.items} />
@@ -219,17 +247,53 @@ export default async function ProfilePage({
               />
             )}
           </>
-        ) : (
-          <div
-            className="px-2 py-16 text-center rounded-[15px]"
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--line)",
-              color: "var(--dim)",
-            }}
-          >
-            {t("comingSoon")}
-          </div>
+        )}
+
+        {tab === "collections" && (
+          <ProfileCollectionsGrid items={userCollections} prefix={prefix} />
+        )}
+
+        {tab === "liked" && (
+          canViewFavourites ? (
+            <>
+              <div className="px-2">
+                {result.items.length > 0 ? (
+                  <WallpaperGrid items={result.items} />
+                ) : (
+                  <div
+                    className="py-16 text-center rounded-[15px]"
+                    style={{
+                      background: "var(--surface)",
+                      border: "1px solid var(--line)",
+                      color: "var(--dim)",
+                    }}
+                  >
+                    No liked wallpapers yet.
+                  </div>
+                )}
+              </div>
+              {result.totalPages > 1 && (
+                <Pagination
+                  page={result.page}
+                  totalPages={result.totalPages}
+                  totalItems={result.total}
+                  basePath={`${prefix}/u/${handle}`}
+                  searchParams={{ tab }}
+                />
+              )}
+            </>
+          ) : (
+            <div
+              className="px-2 py-16 text-center rounded-[15px]"
+              style={{
+                background: "var(--surface)",
+                border: "1px solid var(--line)",
+                color: "var(--dim)",
+              }}
+            >
+              This favourites list is private.
+            </div>
+          )
         )}
       </div>
     </div>

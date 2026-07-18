@@ -28,8 +28,11 @@
   html,body{transition:background-color .25s ease,color .25s ease}
   .hd-sort-tab .hd-sort-lbl{max-width:0;overflow:hidden;opacity:0;transition:max-width .2s ease,opacity .15s ease;white-space:nowrap;display:inline-block;vertical-align:middle}
   .hd-sort-tab:hover .hd-sort-lbl,.hd-sort-active .hd-sort-lbl{max-width:120px;opacity:1}
-  img.site-logo{transition:filter .25s ease}
-  :root[data-theme="light"] img.site-logo{filter:brightness(.92) drop-shadow(0 1px 2px rgba(0,0,0,.12))}
+  img.site-logo-dark{display:none}
+  :root[data-theme="light"] img.site-logo-light{display:block}
+  :root[data-theme="light"] img.site-logo-dark{display:none}
+  :root:not([data-theme="light"]) img.site-logo-light{display:none}
+  :root:not([data-theme="light"]) img.site-logo-dark{display:block}
 
   /* ---- RESPONSIVE ---- */
   @media(max-width:1024px){
@@ -69,6 +72,8 @@
   ::-webkit-scrollbar-thumb:hover{background:#34343c}
   @keyframes spin{to{transform:rotate(360deg)}}
   @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes megaIn{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
   @keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,46,99,.4)}50%{box-shadow:0 0 0 8px rgba(255,46,99,0)}}
 </style>
@@ -80,14 +85,14 @@
 <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
 <header class="hd-header" style="position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:24px;padding:14px 28px;background:var(--glass);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)">
   <div onClick="{{ goHome }}" style="display:flex;align-items:center;cursor:pointer;flex:none">
-    <img src="./assets/logo.png" alt="HD Wallpapers" class="site-logo" style="height:38px;width:auto;display:block"/>
+    <img src="./assets/logo-light.png" alt="HD Wallpapers" class="site-logo site-logo-light" style="height:38px;width:auto"/><img src="./assets/logo-dark.png" alt="HD Wallpapers" class="site-logo site-logo-dark" style="height:38px;width:auto"/>
   </div>
   <nav class="hd-header-nav" style="display:flex;align-items:center;gap:4px;flex:none">
     <span onClick="{{ goHome }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:14px;font-weight:600;color:var(--text);background:var(--line);cursor:pointer">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ sortIconExplore }}"/></svg>{{ i18n.nav_explore }}</span>
-    <span style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer" style-hover="color:var(--text)">
+    <span onClick="{{ goCollections }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer" style-hover="color:var(--text)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ sortIconCollections }}"/></svg>{{ i18n.nav_collections }}</span>
-    <span style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer" style-hover="color:var(--text)">
+    <span onClick="{{ goCommunity }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer" style-hover="color:var(--text)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ sortIconCommunity }}"/></svg>{{ i18n.nav_community }}</span>
   </nav>
   <div class="hd-header-search" style="flex:1;max-width:560px;margin:0 auto;position:relative">
@@ -99,95 +104,6 @@
       </span>
     </sc-if>
 
-    <!-- ====== MEGA SEARCH MENU ====== -->
-    <sc-if value="{{ showMegaSearch }}" hint-placeholder-val="{{ false }}">
-    <div style="position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:200;background:var(--bg2);border:1px solid var(--line2);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,.5);overflow:hidden;animation:fadeUp .15s ease both">
-
-      <!-- WALLPAPERS SECTION -->
-      <div style="padding:14px 16px 10px">
-        <div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim2);margin-bottom:10px">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-          Wallpapers <span style="color:var(--dim3)">· {{ megaSearchLabel }}</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:2px">
-          <sc-for list="{{ megaWalls }}" as="mw" hint-placeholder-count="4">
-            <div onClick="{{ mw.open }}" style="display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:background .12s" style-hover="background:var(--surface2)">
-              <div style="width:52px;height:30px;border-radius:7px;flex:none;background:var(--surface) url({{ mw.thumb }}) center/cover"></div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ mw.title }}</div>
-                <div style="font-size:11.5px;color:var(--dim)">{{ mw.category }} · {{ mw.downloadsF }} downloads</div>
-              </div>
-              <span style="font-size:10px;font-weight:700;background:rgba(34,211,238,.14);color:#7fe6f5;border:1px solid rgba(34,211,238,.3);padding:2px 7px;border-radius:5px;flex:none">4K</span>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-
-      <div style="height:1px;background:var(--line);margin:0 16px"></div>
-
-      <!-- CATEGORIES + TAGS ROW -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
-        <div style="padding:12px 16px;border-right:1px solid var(--line)">
-          <div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim2);margin-bottom:10px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
-            Categories
-          </div>
-          <div style="display:flex;flex-direction:column;gap:1px">
-            <sc-for list="{{ megaCats }}" as="mc" hint-placeholder-count="5">
-              <div onClick="{{ mc.select }}" style="display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-radius:8px;cursor:pointer;font-size:13px;transition:background .12s" style-hover="background:var(--surface2)">
-                <span style="font-weight:600">{{ mc.name }}</span>
-                <span style="font-size:11.5px;color:var(--dim)">{{ mc.count }}</span>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-        <div style="padding:12px 16px">
-          <div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim2);margin-bottom:10px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-            Tags
-          </div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px">
-            <sc-for list="{{ megaTags }}" as="mt" hint-placeholder-count="8">
-              <span onClick="{{ mt.select }}" style="display:inline-flex;align-items:center;height:26px;padding:0 10px;background:var(--surface);border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;transition:all .12s" style-hover="border-color:rgba(255,46,99,.5);color:#ff6a8a">#{{ mt.t }}</span>
-            </sc-for>
-          </div>
-        </div>
-      </div>
-
-      <div style="height:1px;background:var(--line);margin:0 16px"></div>
-
-      <!-- CREATORS SECTION -->
-      <div style="padding:12px 16px 14px">
-        <div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim2);margin-bottom:10px">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
-          Creators
-        </div>
-        <div style="display:flex;gap:10px">
-          <sc-for list="{{ megaCreators }}" as="cr" hint-placeholder-count="4">
-            <div onClick="{{ cr.select }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:all .15s" style-hover="border-color:rgba(255,46,99,.35);transform:translateY(-2px)">
-              <div style="width:40px;height:40px;border-radius:50%;background:var(--surface2) url({{ cr.avatar }}) center/cover;border:2px solid var(--line)"></div>
-              <div style="text-align:center">
-                <div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px">{{ cr.name }}</div>
-                <div style="font-size:11px;color:var(--dim)">{{ cr.uploads }} uploads</div>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-
-      <!-- FOOTER: keyboard hint + view all -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--surface);border-top:1px solid var(--line)">
-        <div style="display:flex;align-items:center;gap:12px;font-size:11px;color:var(--dim2)">
-          <span style="display:flex;align-items:center;gap:4px"><kbd style="background:var(--surface2);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;font-family:monospace;font-size:10px">↑↓</kbd> Navigate</span>
-          <span style="display:flex;align-items:center;gap:4px"><kbd style="background:var(--surface2);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;font-family:monospace;font-size:10px">↵</kbd> Select</span>
-          <span style="display:flex;align-items:center;gap:4px"><kbd style="background:var(--surface2);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;font-family:monospace;font-size:10px">Esc</kbd> Close</span>
-        </div>
-        <sc-if value="{{ hasSearch }}" hint-placeholder-val="{{ false }}">
-          <span onClick="{{ clearSearch }}" style="font-size:12.5px;font-weight:700;color:#ff6a8a;cursor:pointer" style-hover="text-decoration:underline">View all results →</span>
-        </sc-if>
-      </div>
-    </div>
-    </sc-if>
   </div>
   <div style="display:flex;align-items:center;gap:12px;flex:none">
     <button onClick="{{ goUpload }}" style="display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:10px 16px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(255,46,99,.32)">
@@ -225,6 +141,138 @@
   
   </div>
 </header>
+
+<!-- ====== MEGA SEARCH OVERLAY ====== -->
+<sc-if value="{{ showMegaSearch }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeSearch }}" style="position:fixed;inset:0;z-index:98;background:rgba(0,0,0,.55);backdrop-filter:blur(5px);animation:fadeIn .18s ease both"></div>
+<div style="position:fixed;top:76px;left:0;right:0;width:min(1080px,96vw);margin:0 auto;z-index:99;border-radius:22px;overflow:hidden;animation:megaIn .22s cubic-bezier(.16,1,.3,1) both;border:1px solid var(--line2);box-shadow:0 40px 100px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.07);background:var(--bg)">
+
+  <!-- TRENDING STRIP (no query) -->
+  <sc-if value="{{ megaNoQ }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--surface);overflow-x:auto;scrollbar-width:none">
+    <span style="display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:.9px;color:var(--dim2);text-transform:uppercase;flex:none">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" stroke="#f5c518" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Trending
+    </span>
+    <sc-for list="{{ megaTrendingChips }}" as="tc" hint-placeholder-count="6">
+      <span onClick="{{ tc.select }}" style="flex:none;height:27px;padding:0 13px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;white-space:nowrap" style-hover="border-color:#ff2e63;color:#ff6a8a;background:rgba(255,46,99,.08)">{{ tc.label }}</span>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <!-- QUERY HEADER -->
+  <sc-if value="{{ megaHasQ }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--surface)">
+    <div style="display:flex;align-items:center;gap:8px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="var(--dim)" stroke-width="2"/><path d="m20 20-3-3" stroke="var(--dim)" stroke-width="2" stroke-linecap="round"/></svg>
+      <span style="font-size:13px;color:var(--muted)">Results for <strong style="color:var(--text);font-weight:700">"{{ searchQuery }}"</strong></span>
+    </div>
+    <span onClick="{{ clearSearch }}" style="font-size:12px;font-weight:700;color:#ff6a8a;cursor:pointer;display:flex;align-items:center;gap:4px" style-hover="text-decoration:underline">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Clear
+    </span>
+  </div>
+  </sc-if>
+
+  <!-- MAIN GRID: wallpapers | categories+tags | creators -->
+  <div style="display:grid;grid-template-columns:1fr 200px">
+
+    <!-- LEFT COLUMN: wallpapers + creators -->
+    <div style="border-right:1px solid var(--line)">
+
+      <!-- WALLPAPERS -->
+      <div style="padding:16px 18px 14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:22px;height:22px;border-radius:7px;background:rgba(255,46,99,.14);display:flex;align-items:center;justify-content:center;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#ff6a8a" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="#ff6a8a"/><path d="m21 15-5-5L5 21" stroke="#ff6a8a" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <span style="font-size:10.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--dim2)">Wallpapers</span>
+          <span style="font-size:10.5px;color:var(--dim3)">· {{ megaSearchLabel }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <sc-for list="{{ megaWalls }}" as="mw" hint-placeholder-count="4">
+            <div onClick="{{ mw.open }}" style="position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--line)" style-hover="border-color:rgba(255,46,99,.5)">
+              <div style="height:76px;background:var(--surface2) url({{ mw.thumb }}) center/cover"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.78) 0%,transparent 55%)"></div>
+              <div style="position:absolute;bottom:0;left:0;right:0;padding:8px 10px">
+                <div style="font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ mw.title }}</div>
+                <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
+                  <span style="font-size:10px;color:rgba(255,255,255,.6)">{{ mw.category }}</span>
+                  <span style="font-size:9px;font-weight:800;background:rgba(34,211,238,.25);color:#7fe6f5;padding:1px 5px;border-radius:4px;letter-spacing:.3px">4K</span>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- CREATORS -->
+      <div style="padding:12px 18px 16px;border-top:1px solid var(--line)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:22px;height:22px;border-radius:7px;background:rgba(139,92,246,.14);display:flex;align-items:center;justify-content:center;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="#b794f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span style="font-size:10.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--dim2)">Creators</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <sc-for list="{{ megaCreators }}" as="cr" hint-placeholder-count="4">
+            <div onClick="{{ cr.select }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;cursor:pointer" style-hover="border-color:rgba(255,46,99,.35);background:rgba(255,46,99,.04)">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--surface2) url({{ cr.avatar }}) center/cover;border:2px solid var(--line2);flex:none"></div>
+              <div style="min-width:0">
+                <div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cr.name }}</div>
+                <div style="font-size:10.5px;color:var(--dim);margin-top:1px">{{ cr.uploads }} uploads</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: categories + tags -->
+    <div style="display:flex;flex-direction:column">
+
+      <!-- CATEGORIES -->
+      <div style="padding:16px 14px;border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="width:22px;height:22px;border-radius:7px;background:rgba(34,211,238,.13);display:flex;align-items:center;justify-content:center;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="#22d3ee" stroke-width="2"/></svg></div>
+          <span style="font-size:10.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--dim2)">Categories</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1px">
+          <sc-for list="{{ megaCats }}" as="mc" hint-placeholder-count="7">
+            <div onClick="{{ mc.select }}" style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:9px;cursor:pointer" style-hover="background:var(--surface2)">
+              <span style="{{ mc.dotStyle }}"></span>
+              <span style="flex:1;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ mc.name }}</span>
+              <span style="font-size:11px;font-weight:700;color:var(--dim3)">{{ mc.count }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- TAGS -->
+      <div style="padding:14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="width:22px;height:22px;border-radius:7px;background:rgba(245,197,24,.12);display:flex;align-items:center;justify-content:center;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="7" r="1" fill="#f5c518"/></svg></div>
+          <span style="font-size:10.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--dim2)">Tags</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">
+          <sc-for list="{{ megaTags }}" as="mt" hint-placeholder-count="8">
+            <span onClick="{{ mt.select }}" style="display:inline-flex;align-items:center;height:24px;padding:0 9px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;font-size:11.5px;font-weight:600;color:var(--text3);cursor:pointer" style-hover="border-color:#ff2e63;color:#ff6a8a;background:rgba(255,46,99,.08)">#{{ mt.t }}</span>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-top:1px solid var(--line);background:var(--surface2)">
+    <div style="display:flex;align-items:center;gap:14px;font-size:11px;color:var(--dim2)">
+      <span style="display:flex;align-items:center;gap:4px"><kbd style="background:var(--bg);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;font-family:monospace;font-size:10px">↑↓</kbd> Navigate</span>
+      <span style="display:flex;align-items:center;gap:4px"><kbd style="background:var(--bg);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;font-family:monospace;font-size:10px">↵</kbd> Select</span>
+      <span style="display:flex;align-items:center;gap:4px"><kbd style="background:var(--bg);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;font-family:monospace;font-size:10px">Esc</kbd> Close</span>
+    </div>
+    <sc-if value="{{ megaHasQ }}" hint-placeholder-val="{{ false }}">
+      <span onClick="{{ clearSearch }}" style="font-size:12px;font-weight:700;color:#ff6a8a;cursor:pointer;display:flex;align-items:center;gap:4px" style-hover="text-decoration:underline">
+        View all results <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
 </sc-if>
 
 <main>
@@ -437,7 +485,7 @@
     <div style="max-width:1320px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px">
       <div style="max-width:300px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-          <img src="./assets/logo.png" alt="HD Wallpapers" class="site-logo" style="height:30px;width:auto;display:block"/>
+          <img src="./assets/logo-light.png" alt="HD Wallpapers" class="site-logo site-logo-light" style="height:30px;width:auto"/><img src="./assets/logo-dark.png" alt="HD Wallpapers" class="site-logo site-logo-dark" style="height:30px;width:auto"/>
         </div>
         <p style="font-size:13px;color:var(--dim);line-height:1.6">{{ i18n.footer_tagline }}</p>
       </div>
@@ -806,18 +854,45 @@
         <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Title</label>
         <input value="Aurora Fjord" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/>
       </div>
+      <!-- CATEGORIES: multi-select chips -->
       <div>
-        <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Category</label>
-        <div style="display:flex;flex-wrap:wrap;gap:7px">
-          <span style="background:rgba(255,46,99,.14);color:#ff6a8a;border:1px solid rgba(255,46,99,.35);padding:7px 12px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer">Nature</span>
-          <span style="background:var(--surface2);color:var(--muted);border:1px solid var(--line);padding:7px 12px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer">Space</span>
-          <span style="background:var(--surface2);color:var(--muted);border:1px solid var(--line);padding:7px 12px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer">Minimal</span>
-          <span style="background:var(--surface2);color:var(--muted);border:1px solid var(--line);padding:7px 12px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer">+ more</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+          <label style="font-size:12px;font-weight:600;color:var(--muted)">Categories <span style="color:var(--dim3)">(pick all that apply)</span></label>
+          <sc-if value="{{ upHasCats }}" hint-placeholder-val="{{ false }}">
+            <span style="font-size:11px;font-weight:700;color:#ff2e63;background:rgba(255,46,99,.12);border:1px solid rgba(255,46,99,.3);padding:2px 8px;border-radius:999px">{{ upSelectedCatCount }} selected</span>
+          </sc-if>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ upCategoryChips }}" as="cc" hint-placeholder-count="11">
+            <span onClick="{{ cc.toggle }}" style="{{ cc.style }}">{{ cc.cat }}</span>
+          </sc-for>
         </div>
       </div>
+
+      <!-- TAGS: chip input -->
       <div>
-        <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Tags</label>
-        <input placeholder="aurora, fjord, night, 4k…" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+          <label style="font-size:12px;font-weight:600;color:var(--muted)">Tags</label>
+          <span style="font-size:11px;color:var(--dim3)">Press Enter or , to add</span>
+        </div>
+        <!-- existing chips -->
+        <sc-if value="{{ upHasTags }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+            <sc-for list="{{ upTagChips }}" as="tc" hint-placeholder-count="4">
+              <span style="display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);border-radius:999px;font-size:12.5px;font-weight:600;color:#b794f6">
+                #{{ tc.t }}
+                <span onClick="{{ tc.remove }}" style="display:flex;align-items:center;cursor:pointer;opacity:.7;line-height:1" style-hover="opacity:1">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </span>
+              </span>
+            </sc-for>
+          </div>
+        </sc-if>
+        <!-- input -->
+        <div style="position:relative">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="var(--dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="7" r="1" fill="var(--dim)"/></svg>
+          <input value="{{ upTagInput }}" onInput="{{ setUpTagInput }}" onKeyDown="{{ addUpTag }}" placeholder="e.g. aurora, night, 4k…" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px 11px 32px;color:var(--text);font-family:'Manrope';font-size:13.5px;outline:none" style-focus="border-color:rgba(139,92,246,.5)"/>
+        </div>
       </div>
       <div>
         <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">License</label>
@@ -913,7 +988,7 @@
         <div style="width:260px;flex:none;padding:20px;display:flex;flex-direction:column;gap:18px;border-left:1px solid var(--line)">
           <div>
             <div style="display:flex;justify-content:space-between;margin-bottom:8px"><label style="font-size:12px;font-weight:700;color:var(--muted)">Zoom</label><span style="font-size:12px;font-weight:700;color:var(--text)">{{ upPreviewVariant.zoom }}×</span></div>
-            <input type="range" min="1" max="3" step="0.05" value="{{ upPreviewVariant.zoomVal }}" onInput="{{ upPreviewVariant.setZoom }}" style="width:100%;accent-color:#ff2e63"/>
+            <input type="range" min="1" max="50" step="0.25" value="{{ upPreviewVariant.zoomVal }}" onInput="{{ upPreviewVariant.setZoom }}" style="width:100%;accent-color:#ff2e63"/>
           </div>
           <div>
             <div style="display:flex;justify-content:space-between;margin-bottom:8px"><label style="font-size:12px;font-weight:700;color:var(--muted)">Horizontal position</label><span style="font-size:12px;font-weight:700;color:var(--text)">{{ upPreviewVariant.posX }}%</span></div>
@@ -1028,6 +1103,146 @@
   </div>
 </div>
 </sc-if>
+<!-- ================= COLLECTIONS ================= -->
+<sc-if value="{{ isCollections }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;background:var(--bg)">
+
+  <!-- HERO BANNER -->
+  <div style="position:relative;height:220px;overflow:hidden;background:var(--surface)">
+    <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0d0d1a 0%,#1a0d2e 40%,#0a1628 100%)"></div>
+    <!-- mosaic of featured thumbs blurred -->
+    <sc-for list="{{ collectionsFeatured }}" as="cf" hint-placeholder-count="3">
+      <div style="position:absolute;top:0;bottom:0;width:34%;background:var(--surface2) url({{ cf.heroThumb }}) center/cover;opacity:.18"></div>
+    </sc-for>
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(255,46,99,.18) 0%,transparent 60%)"></div>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:0 24px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#ff2e63,#8b5cf6);display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M19 11H5M19 11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2M19 11V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h1 style="font-family:'Space Grotesk';font-weight:800;font-size:32px;letter-spacing:-.8px;color:#fff">Collections</h1>
+      </div>
+      <p style="font-size:14px;color:rgba(255,255,255,.55);max-width:480px;line-height:1.6">Curated sets of the finest wallpapers — handpicked by creators and community members.</p>
+    </div>
+  </div>
+
+  <!-- FEATURED COLLECTIONS ROW -->
+  <div style="max-width:1400px;margin:0 auto;padding:32px 28px 0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 0 0 .95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 0 0-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 0 0-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 0 0-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 0 0 .951-.69l1.519-4.674z" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-family:'Space Grotesk';font-weight:700;font-size:16px">Featured Collections</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px">
+      <sc-for list="{{ collectionsFeatured }}" as="cf" hint-placeholder-count="3">
+        <div onClick="{{ cf.open }}" style="position:relative;border-radius:18px;overflow:hidden;cursor:pointer;border:1px solid var(--line);height:200px" style-hover="border-color:rgba(255,46,99,.5)">
+          <div style="position:absolute;inset:0;background:var(--surface2) url({{ cf.heroThumb }}) center/cover"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.85) 0%,rgba(0,0,0,.2) 50%,transparent 100%)"></div>
+          <div style="position:absolute;top:12px;right:12px"><span style="{{ cf.catStyle }}">{{ cf.category }}</span></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:16px 18px">
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:17px;color:#fff;margin-bottom:4px;text-wrap:balance">{{ cf.name }}</div>
+            <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:rgba(255,255,255,.7)">
+              <span style="display:flex;align-items:center;gap:5px">
+                <div style="width:20px;height:20px;border-radius:50%;background:var(--surface2) url({{ cf.curatorAvatar }}) center/cover;border:1px solid rgba(255,255,255,.2)"></div>
+                {{ cf.curator }}
+              </span>
+              <span style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M19 11H5M19 11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>{{ cf.count }}</span>
+              <span style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ cf.savesF }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- FILTER + SEARCH BAR -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <sc-for list="{{ collectionsFilterItems }}" as="fi" hint-placeholder-count="6">
+          <button onClick="{{ fi.select }}" style="{{ fi.style }}">{{ fi.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <!-- search -->
+        <div style="position:relative;width:220px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="11" cy="11" r="7" stroke="var(--dim)" stroke-width="2"/><path d="m20 20-3-3" stroke="var(--dim)" stroke-width="2" stroke-linecap="round"/></svg>
+          <input value="{{ collectionsSearch }}" onInput="{{ setCollectionsSearch }}" placeholder="Search collections…" style="width:100%;height:36px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:0 32px 0 32px;font-family:'Manrope';font-size:13px;color:var(--text);outline:none" style-focus="border-color:rgba(255,46,99,.5)"/>
+          <sc-if value="{{ collectionsHasSearch }}" hint-placeholder-val="{{ false }}">
+            <span onClick="{{ clearCollectionsSearch }}" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--dim);display:flex;align-items:center">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
+          </sc-if>
+        </div>
+        <!-- sort -->
+        <div style="display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:4px">
+          <sc-for list="{{ collectionsSortItems }}" as="si" hint-placeholder-count="3">
+            <button onClick="{{ si.select }}" style="{{ si.btnStyle }}">{{ si.l }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS COUNT -->
+    <div style="font-size:13px;color:var(--dim);margin-bottom:18px">{{ collectionsCount }} collections</div>
+
+    <!-- COLLECTIONS GRID -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;padding-bottom:64px">
+      <sc-for list="{{ collectionsList }}" as="col" hint-placeholder-count="9">
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column" style-hover="border-color:rgba(255,46,99,.4)">
+
+          <!-- mosaic thumbnail -->
+          <div onClick="{{ col.open }}" style="display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;height:164px;cursor:pointer;gap:2px">
+            <div style="grid-row:span 2;background:var(--surface2) url({{ col.thumb1 }}) center/cover"></div>
+            <div style="background:var(--surface2) url({{ col.thumb2 }}) center/cover"></div>
+            <div style="background:var(--surface2) url({{ col.thumb3 }}) center/cover"></div>
+          </div>
+
+          <!-- info -->
+          <div style="padding:14px 16px;flex:1;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+              <div style="flex:1;min-width:0">
+                <div onClick="{{ col.open }}" style="font-family:'Space Grotesk';font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="color:#ff6a8a">{{ col.name }}</div>
+                <p style="font-size:12.5px;color:var(--text3);line-height:1.5;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ col.desc }}</p>
+              </div>
+              <!-- save button -->
+              <div onClick="{{ col.toggleSave }}" style="{{ col.savedStyle }}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="{{ col.isSaved ? 'currentColor' : 'none' }}"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+
+            <!-- meta row -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--line)">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:26px;height:26px;border-radius:50%;background:var(--surface2) url({{ col.curatorAvatar }}) center/cover;border:2px solid var(--line2);flex:none"></div>
+                <div>
+                  <div style="font-size:12px;font-weight:700;color:var(--text)">{{ col.curator }}</div>
+                  <div style="font-size:10.5px;color:var(--dim)">Curator</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:11.5px;color:var(--dim)">
+                <span style="display:flex;align-items:center;gap:4px">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M19 11H5M19 11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  {{ col.count }}
+                </span>
+                <span style="display:flex;align-items:center;gap:4px">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                  {{ col.viewsF }}
+                </span>
+                <span style="display:flex;align-items:center;gap:4px;font-weight:700;color:var(--text3)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  {{ col.savesF }}
+                </span>
+                <span style="{{ col.catStyle }}">{{ col.category }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
 <!-- ================= ADMIN AREA ================= -->
 <sc-if value="{{ isAdminArea }}" hint-placeholder-val="{{ false }}">
 <div style="display:flex;min-height:100vh">
@@ -1035,7 +1250,7 @@
   <aside style="width:236px;flex:none;background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:18px 14px">
     <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 20px">
       <div style="display:flex;flex-direction:column;gap:2px">
-        <img src="./assets/logo.png" alt="HD Wallpapers" class="site-logo" style="height:28px;width:auto;display:block"/>
+        <img src="./assets/logo-light.png" alt="HD Wallpapers" class="site-logo site-logo-light" style="height:28px;width:auto"/><img src="./assets/logo-dark.png" alt="HD Wallpapers" class="site-logo site-logo-dark" style="height:28px;width:auto"/>
         <div style="font-size:10px;color:var(--dim2);letter-spacing:.3px">Admin panel</div>
       </div>
     </div>
@@ -1767,23 +1982,23 @@
           <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px;margin-bottom:16px">Registration &amp; permissions</div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)">
             <div><div style="font-size:13.5px;font-weight:600">Users can register</div><div style="font-size:12px;color:var(--dim);margin-top:1px">Allow new user registrations</div></div>
-            <div onClick="{{ toggleMS('canRegister') }}" style="{{ canRegisterStyle }}"><div style="{{ memberSettings.canRegister ? knobOnStyle : knobOffStyle }}"></div></div>
+            <div onClick="{{ toggleMS('canRegister') }}" style="{{ canRegisterStyle }}"><div style="{{ canRegisterKnob }}"></div></div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)">
             <div><div style="font-size:13.5px;font-weight:600">Require email confirmation</div><div style="font-size:12px;color:var(--dim);margin-top:1px">Send verification link on signup</div></div>
-            <div onClick="{{ toggleMS('requireConfirmation') }}" style="{{ reqConfStyle }}"><div style="{{ memberSettings.requireConfirmation ? knobOnStyle : knobOffStyle }}"></div></div>
+            <div onClick="{{ toggleMS('requireConfirmation') }}" style="{{ reqConfStyle }}"><div style="{{ reqConfKnob }}"></div></div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)">
             <div><div style="font-size:13.5px;font-weight:600">Users can submit wallpapers</div><div style="font-size:12px;color:var(--dim);margin-top:1px">Allow uploads from registered users</div></div>
-            <div onClick="{{ toggleMS('canSubmit') }}" style="{{ canSubmitStyle }}"><div style="{{ memberSettings.canSubmit ? knobOnStyle : knobOffStyle }}"></div></div>
+            <div onClick="{{ toggleMS('canSubmit') }}" style="{{ canSubmitStyle }}"><div style="{{ canSubmitKnob }}"></div></div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)">
             <div><div style="font-size:13.5px;font-weight:600">Users can post comments</div><div style="font-size:12px;color:var(--dim);margin-top:1px">Allow comments on wallpapers</div></div>
-            <div onClick="{{ toggleMS('canComment') }}" style="{{ canCommentStyle }}"><div style="{{ memberSettings.canComment ? knobOnStyle : knobOffStyle }}"></div></div>
+            <div onClick="{{ toggleMS('canComment') }}" style="{{ canCommentStyle }}"><div style="{{ canCommentKnob }}"></div></div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0">
             <div><div style="font-size:13.5px;font-weight:600">Moderate wallpaper comments</div><div style="font-size:12px;color:var(--dim);margin-top:1px">Admin approval before comments appear</div></div>
-            <div onClick="{{ toggleMS('moderateComments') }}" style="{{ modCommentStyle }}"><div style="{{ memberSettings.moderateComments ? knobOnStyle : knobOffStyle }}"></div></div>
+            <div onClick="{{ toggleMS('moderateComments') }}" style="{{ modCommentStyle }}"><div style="{{ modCommentKnob }}"></div></div>
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:16px">
@@ -1857,7 +2072,7 @@
             <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Featured wallpapers</label><input value="{{ wallDefaults.featuredCount }}" onInput="{{ setWDFeatured }}" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:9px;padding:10px 12px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px 14px">
               <div><div style="font-size:13.5px;font-weight:600">Show pagination on latest</div></div>
-              <div onClick="{{ toggleWDPagination }}" style="{{ wdPaginationStyle }}"><div style="{{ wallDefaults.showPagination ? knobOnStyle : knobOffStyle }}"></div></div>
+              <div onClick="{{ toggleWDPagination }}" style="{{ wdPaginationStyle }}"><div style="{{ wdPaginationKnobStyle }}"></div></div>
             </div>
           </div>
           <button style="margin-top:16px;background:var(--surface2);border:1px solid var(--line2);color:var(--text);border-radius:9px;padding:10px 18px;font-family:'Manrope';font-weight:700;font-size:13.5px;cursor:pointer">Update settings</button>
@@ -1960,9 +2175,520 @@
       </div>
     </div>
     </sc-if>
+
+    <!-- COLLECTIONS (admin table) -->
+    <sc-if value="{{ isAdmCollections }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:26px 30px 50px;animation:fadeUp .35s ease both">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:26px;letter-spacing:-.5px">Collections</h1>
+          <div style="font-size:13px;color:var(--dim);margin-top:3px">{{ adminCollectionsCount }} total · curated &amp; user-submitted</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="position:relative">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="position:absolute;left:12px;top:50%;transform:translateY(-50%)"><circle cx="11" cy="11" r="7" stroke="var(--dim2)" stroke-width="2"/><path d="m20 20-3-3" stroke="var(--dim2)" stroke-width="2" stroke-linecap="round"/></svg>
+            <input value="{{ adminCollectionsSearch }}" onInput="{{ setAdminCollectionsSearch }}" placeholder="Search collections…" style="width:220px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px 9px 34px;color:var(--text);font-family:'Manrope';font-size:13.5px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/>
+          </div>
+          <button onClick="{{ openNewCollectionModal }}" style="display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-family:'Manrope';font-weight:700;font-size:13.5px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>New collection
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:3px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:4px;margin-bottom:14px;width:fit-content">
+        <sc-for list="{{ adminCollectionsFilterTabs }}" as="f" hint-placeholder-count="4">
+          <span onClick="{{ f.select }}" style="{{ f.style }}">{{ f.label }}</span>
+        </sc-for>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:15px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:56px 1.8fr 1fr 1fr .7fr .8fr 110px 130px;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--dim2);align-items:center">
+          <span></span><span>Name</span><span>Category</span><span>Curator</span><span>Walls</span><span>Saves</span><span>Status</span><span>Actions</span>
+        </div>
+        <sc-for list="{{ adminCollectionsRows }}" as="c" hint-placeholder-count="8">
+          <div style="display:grid;grid-template-columns:56px 1.8fr 1fr 1fr .7fr .8fr 110px 130px;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:center" style-hover="background:var(--surface2)">
+            <div style="width:56px;height:34px;border-radius:7px;background:var(--surface2) url({{ c.thumb }}) center/cover;flex:none"></div>
+            <div style="min-width:0">
+              <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</div>
+              <div style="font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.desc }}</div>
+            </div>
+            <div><span style="{{ c.catStyle }}">{{ c.category }}</span></div>
+            <div style="display:flex;align-items:center;gap:7px;min-width:0">
+              <span style="width:22px;height:22px;border-radius:50%;background:var(--surface2) url({{ c.curatorAvatar }}) center/cover;flex:none"></span>
+              <span style="font-size:12.5px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.curator }}</span>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--text3)">{{ c.count }}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text3)">{{ c.savesF }}</div>
+            <div><span style="{{ c.statusStyle }}">{{ c.statusLabel }}</span></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div onClick="{{ c.toggleFeature }}" title="Feature" style="{{ c.featureBtnStyle }}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="{{ c.featured ? 'currentColor' : 'none' }}"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 0 0 .95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 0 0-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 0 0-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 0 0-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 0 0 .951-.69l1.519-4.674z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              </div>
+              <div onClick="{{ c.edit }}" title="Edit" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--dim2);border:1px solid var(--line)" style-hover="background:var(--surface3);color:var(--text)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div onClick="{{ c.remove }}" title="Delete" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#ff8a8d" style-hover="background:rgba(229,72,77,.12)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- COMMUNITY (admin) -->
+    <sc-if value="{{ isAdmCommunity }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:26px 30px 50px;animation:fadeUp .35s ease both">
+      <div style="margin-bottom:18px">
+        <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:26px;letter-spacing:-.5px">Community</h1>
+        <div style="font-size:13px;color:var(--dim);margin-top:3px">Moderate the activity feed and manage challenges</div>
+      </div>
+
+      <div style="display:flex;gap:3px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:4px;margin-bottom:20px;width:fit-content">
+        <button onClick="{{ setAdmComFeed }}" style="{{ admComFeedTabStyle }}">
+          Feed Moderation
+          <sc-if value="{{ hasFlaggedPosts }}" hint-placeholder-val="{{ false }}">
+            <span style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:#ff2e63;color:#fff;border-radius:999px;font-size:10.5px;font-weight:700">{{ flaggedCount }}</span>
+          </sc-if>
+        </button>
+        <button onClick="{{ setAdmComChallenges }}" style="{{ admComChallengesTabStyle }}">Challenges</button>
+      </div>
+
+      <sc-if value="{{ isAdmComFeed }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ adminFeedRows }}" as="fi" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px" style-hover="border-color:var(--line2)">
+            <div style="width:38px;height:38px;border-radius:50%;background:var(--surface2) url({{ fi.avatar }}) center/cover;flex:none"></div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span style="font-size:13.5px;font-weight:700">{{ fi.user }}</span>
+                <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:{{ fi.typeIconBg }};color:{{ fi.typeIconCol }}">{{ fi.typeLabel }}</span>
+                <sc-if value="{{ fi.flagged }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:11px;font-weight:700;color:#ff8a8d;background:rgba(229,72,77,.12);border:1px solid rgba(229,72,77,.3);padding:2px 8px;border-radius:999px">Flagged</span>
+                </sc-if>
+              </div>
+              <div style="font-size:12.5px;color:var(--dim3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fi.summary }}</div>
+            </div>
+            <div style="font-size:12px;color:var(--dim);flex:none">{{ fi.ts }}</div>
+            <div style="display:flex;gap:6px;flex:none">
+              <sc-if value="{{ fi.flagged }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ fi.approve }}" style="background:rgba(48,164,108,.15);border:1px solid rgba(48,164,108,.4);color:#5fd398;border-radius:8px;padding:7px 12px;font-family:'Manrope';font-weight:700;font-size:12.5px;cursor:pointer">Approve</button>
+              </sc-if>
+              <button onClick="{{ fi.remove }}" style="background:rgba(229,72,77,.12);border:1px solid rgba(229,72,77,.35);color:#ff8a8d;border-radius:8px;padding:7px 12px;font-family:'Manrope';font-weight:700;font-size:12.5px;cursor:pointer">Remove</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isAdmComChallenges }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+          <button onClick="{{ openNewChallengeModal }}" style="display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-family:'Manrope';font-weight:700;font-size:13.5px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>New challenge
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ adminChallengeRows }}" as="ch" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px" style-hover="border-color:var(--line2)">
+              <div style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ ch.color }}"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:14.5px;font-weight:700">{{ ch.title }}</div>
+                <div style="font-size:12px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ch.desc }}</div>
+              </div>
+              <div style="text-align:center;flex:none"><div style="font-family:'Space Grotesk';font-weight:700;font-size:15px">{{ ch.entries }}</div><div style="font-size:10.5px;color:var(--dim)">Entries</div></div>
+              <div style="font-size:12.5px;color:var(--dim);flex:none;min-width:110px">Ends {{ ch.deadline }}</div>
+              <div style="display:flex;gap:6px;flex:none">
+                <div onClick="{{ ch.edit }}" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--dim2);border:1px solid var(--line)" style-hover="background:var(--surface3);color:var(--text)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div onClick="{{ ch.remove }}" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#ff8a8d" style-hover="background:rgba(229,72,77,.12)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- collection create/edit modal -->
+    <sc-if value="{{ hasCollectionModal }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:20px;width:100%;max-width:460px;padding:26px;animation:fadeUp .2s ease both">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+          <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:19px">{{ collectionModalTitle }}</h3>
+          <span onClick="{{ closeCollectionModal }}" style="cursor:pointer;color:var(--dim2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Name</label><input value="{{ collectionModalName }}" onInput="{{ setCollectionModalName }}" placeholder="Collection name" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Category</label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <sc-for list="{{ collectionCategoryChips }}" as="opt" hint-placeholder-count="5">
+                <span onClick="{{ opt.select }}" style="{{ opt.style }}">{{ opt.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Description</label><textarea value="{{ collectionModalDesc }}" onInput="{{ setCollectionModalDesc }}" rows="3" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none;resize:vertical" style-focus="border-color:rgba(255,46,99,.5)">{{ collectionModalDesc }}</textarea></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:2px">
+            <div style="font-size:13.5px;font-weight:600">Feature on homepage</div>
+            <div onClick="{{ toggleCollectionModalFeatured }}" style="{{ collectionModalFeaturedSwitchStyle }}"><div style="{{ collectionModalFeaturedKnobStyle }}"></div></div>
+          </div>
+          <button onClick="{{ saveCollectionModal }}" style="margin-top:4px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:12px 20px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">{{ collectionModalSaveLabel }}</button>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- challenge create/edit modal -->
+    <sc-if value="{{ hasChallengeModal }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:20px;width:100%;max-width:460px;padding:26px;animation:fadeUp .2s ease both">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+          <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:19px">{{ challengeModalTitle }}</h3>
+          <span onClick="{{ closeChallengeModal }}" style="cursor:pointer;color:var(--dim2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Title</label><input value="{{ challengeModalTitleVal }}" onInput="{{ setChallengeModalTitle }}" placeholder="Challenge title" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Accent color</label>
+            <div style="display:flex;gap:8px">
+              <sc-for list="{{ challengeColorChips }}" as="cc" hint-placeholder-count="5">
+                <span onClick="{{ cc.select }}" style="{{ cc.style }}"></span>
+              </sc-for>
+            </div>
+          </div>
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Description</label><textarea value="{{ challengeModalDesc }}" onInput="{{ setChallengeModalDesc }}" rows="3" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none;resize:vertical" style-focus="border-color:rgba(255,46,99,.5)">{{ challengeModalDesc }}</textarea></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Prize</label><input value="{{ challengeModalPrize }}" onInput="{{ setChallengeModalPrize }}" placeholder="Creator badge…" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
+            <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Deadline</label><input value="{{ challengeModalDeadline }}" onInput="{{ setChallengeModalDeadline }}" placeholder="Jul 31, 2026" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
+          </div>
+          <button onClick="{{ saveChallengeModal }}" style="margin-top:4px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:12px 20px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">{{ challengeModalSaveLabel }}</button>
+        </div>
+      </div>
+    </div>
+    </sc-if>
   </div>
 </div>
 </sc-if>
+<!-- ================= COMMUNITY ================= -->
+<sc-if value="{{ isCommunity }}" hint-placeholder-val="{{ false }}">
+<div style="min-height:100vh;background:var(--bg);animation:fadeUp .4s ease both;padding-bottom:80px">
+
+  <!-- HERO BANNER -->
+  <div style="position:relative;overflow:hidden;background:var(--surface);border-bottom:1px solid var(--line)">
+    <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,46,99,.12) 0%,rgba(139,92,246,.1) 40%,rgba(34,211,238,.08) 100%)"></div>
+    <div style="position:absolute;top:-60px;right:-60px;width:320px;height:320px;border-radius:50%;background:rgba(255,46,99,.06);filter:blur(60px)"></div>
+    <div style="position:absolute;bottom:-40px;left:20%;width:240px;height:240px;border-radius:50%;background:rgba(139,92,246,.07);filter:blur(50px)"></div>
+    <div style="position:relative;max-width:1320px;margin:0 auto;padding:48px 28px 40px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:24px">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,46,99,.15);border:1px solid rgba(255,46,99,.28);border-radius:999px;padding:5px 13px;margin-bottom:14px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm14 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="#ff6a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#ff6a8a">Community</span>
+          </div>
+          <h1 style="font-family:'Space Grotesk';font-weight:800;font-size:42px;letter-spacing:-1.2px;line-height:1.05;margin-bottom:12px">Where creators<br/>share &amp; inspire.</h1>
+          <p style="font-size:15px;color:var(--text3);line-height:1.6;max-width:480px">Browse the latest uploads, discover collections, join monthly challenges and connect with talented creators from around the world.</p>
+          <div style="display:flex;gap:10px;margin-top:22px">
+            <button onClick="{{ goUpload }}" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:12px;padding:12px 22px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(255,46,99,.32)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0 5 5m-5-5L7 9" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+              Upload wallpaper
+            </button>
+            <button onClick="{{ goHome }}" style="display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:12px 22px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm-2 14.5v-9l6 4.5-6 4.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Browse gallery
+            </button>
+          </div>
+        </div>
+        <!-- platform stats -->
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;flex:none">
+          <div style="background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:16px 20px;min-width:120px">
+            <div style="font-family:'Space Grotesk';font-weight:800;font-size:26px;color:var(--text);letter-spacing:-.5px">42k</div>
+            <div style="font-size:12px;color:var(--dim);margin-top:2px;font-weight:600">Members</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:16px 20px;min-width:120px">
+            <div style="font-family:'Space Grotesk';font-weight:800;font-size:26px;color:#ff6a8a;letter-spacing:-.5px">18k</div>
+            <div style="font-size:12px;color:var(--dim);margin-top:2px;font-weight:600">Wallpapers</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:16px 20px;min-width:120px">
+            <div style="font-family:'Space Grotesk';font-weight:800;font-size:26px;color:#22d3ee;letter-spacing:-.5px">2.1M</div>
+            <div style="font-size:12px;color:var(--dim);margin-top:2px;font-weight:600">Downloads</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:16px 20px;min-width:120px">
+            <div style="font-family:'Space Grotesk';font-weight:800;font-size:26px;color:#30a46c;letter-spacing:-.5px">94</div>
+            <div style="font-size:12px;color:var(--dim);margin-top:2px;font-weight:600">Countries</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div style="background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:60">
+    <div style="max-width:1320px;margin:0 auto;padding:0 28px;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;padding-top:10px;padding-bottom:10px">
+      <button onClick="{{ setComFeed }}" style="{{ comTabFeedStyle }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h8M4 18h12"/></svg>
+        Activity Feed
+      </button>
+      <button onClick="{{ setComCreators }}" style="{{ comTabCreatorsStyle }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Top Creators
+      </button>
+      <button onClick="{{ setComChallenges }}" style="{{ comTabChallengesStyle }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M8 4h8M8 20h8M10 4v16M14 4v16M4 9v6a8 8 0 0 0 16 0V9"/></svg>
+        Challenges
+      </button>
+      <button onClick="{{ setComCollections }}" style="{{ comTabCollectionsStyle }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17l-7-4-7 4V4z"/></svg>
+        Collections
+      </button>
+    </div>
+  </div>
+
+  <div style="max-width:1320px;margin:0 auto;padding:28px 28px 0">
+
+    <!-- ===== FEED TAB ===== -->
+    <sc-if value="{{ isComFeed }}" hint-placeholder-val="{{ true }}">
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start">
+      <!-- feed stream -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ communityFeedItems }}" as="fi" hint-placeholder-count="5">
+          <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden" style-hover="border-color:var(--line2)">
+            <!-- item header -->
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px 10px">
+              <div style="position:relative;flex:none">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--surface2) url({{ fi.avatar }}) center/cover;border:2px solid var(--line)"></div>
+                <div style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);background:{{ fi.typeIconBg }}">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="{{ fi.typeIconCol }}" stroke="none"><path d="{{ fi.typeIconPath }}"/></svg>
+                </div>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                  <span style="font-size:13.5px;font-weight:700">{{ fi.user }}</span>
+                  <span style="font-size:12px;color:var(--dim)">@{{ fi.handle }}</span>
+                  <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:{{ fi.typeIconBg }};color:{{ fi.typeIconCol }}">{{ fi.typeLabel }}</span>
+                </div>
+                <div style="font-size:12px;color:var(--dim3);margin-top:2px">{{ fi.ts }}</div>
+              </div>
+            </div>
+            <!-- upload content -->
+            <sc-if value="{{ fi.isUpload }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;margin:0 14px 14px;border-radius:12px;overflow:hidden;cursor:pointer" onClick="{{ goHome }}" style-hover="opacity:.9">
+              <div style="height:160px;background:var(--surface2) url({{ fi.thumbUrl }}) center/cover"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.65) 0%,transparent 50%)"></div>
+              <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;display:flex;align-items:flex-end;justify-content:space-between">
+                <div>
+                  <div style="font-size:15px;font-weight:700;color:#fff">{{ fi.title }}</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">{{ fi.category }}</div>
+                </div>
+                <div style="display:flex;gap:12px;font-size:12px;color:rgba(255,255,255,.75);font-weight:600">
+                  <span style="display:flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>{{ fi.likesF }}</span>
+                  <span style="display:flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>{{ fi.dlF }}</span>
+                </div>
+              </div>
+            </div>
+            </sc-if>
+            <!-- comment content -->
+            <sc-if value="{{ fi.isComment }}" hint-placeholder-val="{{ false }}">
+            <div style="margin:0 14px 14px;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:13px 14px">
+              <div style="font-size:13.5px;color:var(--text3);line-height:1.6;font-style:italic">"{{ fi.text }}"</div>
+              <div style="margin-top:9px;font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:5px">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                on <span style="font-weight:700;color:var(--text3)">{{ fi.wallTitle }}</span>
+              </div>
+            </div>
+            </sc-if>
+            <!-- milestone content -->
+            <sc-if value="{{ fi.isMilestone }}" hint-placeholder-val="{{ false }}">
+            <div style="margin:0 14px 14px;display:flex;align-items:center;gap:12px;background:rgba(245,197,24,.09);border:1px solid rgba(245,197,24,.25);border-radius:11px;padding:13px 14px">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(245,197,24,.2);display:flex;align-items:center;justify-content:center;flex:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#f5c518" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <div style="font-size:13.5px;font-weight:600;color:var(--text)">{{ fi.milestone }}</div>
+            </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- right sidebar -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- this week's top -->
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden">
+          <div style="padding:16px 16px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M23 6l-9.5 9.5-5-5L1 18M17 6h6v6" stroke="#f5c518" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-family:'Space Grotesk';font-weight:700;font-size:15px">This week</span>
+          </div>
+          <sc-for list="{{ communityLeaderboard }}" as="cl" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line)" style-hover="background:var(--surface2)">
+              <div style="{{ cl.rankStyle }}">{{ cl.rank }}</div>
+              <div style="width:34px;height:34px;border-radius:50%;background:var(--surface2) url({{ cl.avatar }}) center/cover;border:2px solid var(--line);flex:none"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cl.name }}</div>
+                <div style="font-size:11.5px;color:var(--dim);margin-top:1px">{{ cl.downloads }} downloads</div>
+              </div>
+              <button style="flex:none;background:var(--surface2);border:1px solid var(--line2);color:var(--text);border-radius:8px;padding:5px 10px;font-family:'Manrope';font-weight:700;font-size:12px;cursor:pointer">Follow</button>
+            </div>
+          </sc-for>
+        </div>
+        <!-- active challenges preview -->
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-family:'Space Grotesk';font-weight:700;font-size:15px">Challenges</span>
+            <span onClick="{{ setComChallenges }}" style="font-size:12px;font-weight:700;color:#ff6a8a;cursor:pointer" style-hover="text-decoration:underline">See all →</span>
+          </div>
+          <sc-for list="{{ communityChallenges }}" as="ch" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)">
+              <div style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ ch.accentColor }}"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ch.title }}</div>
+                <div style="font-size:11.5px;color:var(--dim);margin-top:1px">{{ ch.entries }} entries · {{ ch.deadline }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== TOP CREATORS TAB ===== -->
+    <sc-if value="{{ isComCreators }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:22px;letter-spacing:-.4px">Top Creators</h2>
+          <div style="font-size:13px;color:var(--dim);margin-top:3px">Ranked by total downloads this month</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ communityLeaderboard }}" as="cl" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 20px" style-hover="border-color:var(--line2)">
+            <div style="{{ cl.rankStyle }};font-size:16px;width:36px;height:36px">{{ cl.rank }}</div>
+            <div style="width:52px;height:52px;border-radius:50%;background:var(--surface2) url({{ cl.avatar }}) center/cover;border:3px solid var(--line);flex:none"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:16px;font-weight:700">{{ cl.name }}</div>
+              <div style="font-size:13px;color:var(--dim);margin-top:2px">@{{ cl.handle }} · {{ cl.role }}</div>
+            </div>
+            <div style="display:flex;gap:24px;text-align:center;flex:none">
+              <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:17px">{{ cl.uploads }}</div><div style="font-size:11px;color:var(--dim);margin-top:1px">Uploads</div></div>
+              <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:17px;color:#22d3ee">{{ cl.downloads }}</div><div style="font-size:11px;color:var(--dim);margin-top:1px">Downloads</div></div>
+            </div>
+            <button style="flex:none;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:10px 18px;font-family:'Manrope';font-weight:700;font-size:13.5px;cursor:pointer;box-shadow:0 4px 12px rgba(255,46,99,.28)">Follow</button>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== CHALLENGES TAB ===== -->
+    <sc-if value="{{ isComChallenges }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:22px;letter-spacing:-.4px">Monthly Challenges</h2>
+          <div style="font-size:13px;color:var(--dim);margin-top:3px">Upload wallpapers matching the theme to enter</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px">
+        <sc-for list="{{ communityChallenges }}" as="ch" hint-placeholder-count="3">
+          <div style="{{ ch.cardBorderStyle }};background:var(--surface)">
+            <!-- challenge header -->
+            <div style="padding:20px 20px 16px;{{ ch.headerBg }}">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px">
+                <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:20px;letter-spacing:-.3px">{{ ch.title }}</h3>
+                <span style="{{ ch.activePillStyle }}">{{ ch.activeBadge }}</span>
+              </div>
+              <p style="font-size:13.5px;color:var(--text3);line-height:1.6;margin-bottom:14px">{{ ch.desc }}</p>
+              <!-- sample thumbnails -->
+              <div style="display:flex;gap:6px">
+                <div style="flex:1;height:60px;border-radius:9px;background:var(--surface2) url({{ ch.th1 }}) center/cover"></div>
+                <div style="flex:1;height:60px;border-radius:9px;background:var(--surface2) url({{ ch.th2 }}) center/cover"></div>
+                <div style="flex:1;height:60px;border-radius:9px;background:var(--surface2) url({{ ch.th3 }}) center/cover"></div>
+              </div>
+            </div>
+            <!-- challenge footer -->
+            <div style="padding:14px 20px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="font-size:12px;color:var(--dim);display:flex;align-items:center;gap:5px">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                  <span style="font-weight:600;color:var(--text3)">{{ ch.entries }}</span> entries so far
+                </div>
+                <div style="font-size:12px;color:var(--dim);display:flex;align-items:center;gap:5px">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                  Ends <span style="font-weight:600;color:var(--text3)">{{ ch.deadline }}</span>
+                </div>
+                <div style="font-size:11.5px;margin-top:2px">
+                  <span style="{{ ch.pillStyle }}">🏆 {{ ch.prize }}</span>
+                </div>
+              </div>
+              <button onClick="{{ goUpload }}" style="background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-family:'Manrope';font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 12px rgba(255,46,99,.28);white-space:nowrap">Enter now →</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== COLLECTIONS TAB ===== -->
+    <sc-if value="{{ isComCollections }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:22px;letter-spacing:-.4px">Featured Collections</h2>
+          <div style="font-size:13px;color:var(--dim);margin-top:3px">Curated sets by the community's top creators</div>
+        </div>
+        <button onClick="{{ goUpload }}" style="display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line2);color:var(--text);border-radius:11px;padding:10px 18px;font-family:'Manrope';font-weight:700;font-size:13.5px;cursor:pointer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          Create collection
+        </button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px">
+        <sc-for list="{{ communityCollections }}" as="co" hint-placeholder-count="4">
+          <div style="background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;cursor:pointer" style-hover="border-color:rgba(255,46,99,.35);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.2)">
+            <!-- mosaic preview -->
+            <div style="display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;height:160px;gap:2px">
+              <div style="grid-row:1/3;background:var(--surface2) url({{ co.th1 }}) center/cover"></div>
+              <div style="background:var(--surface2) url({{ co.th3 }}) center/cover"></div>
+              <div style="background:var(--surface2) url({{ co.th4 }}) center/cover"></div>
+            </div>
+            <!-- collection info -->
+            <div style="padding:14px 16px">
+              <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:16px;letter-spacing:-.2px;margin-bottom:4px">{{ co.name }}</h3>
+              <p style="font-size:12.5px;color:var(--dim);line-height:1.5;margin-bottom:12px">{{ co.desc }}</p>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:26px;height:26px;border-radius:50%;background:var(--surface2) url({{ co.curatorAvatar }}) center/cover;border:2px solid var(--line);flex:none"></div>
+                  <span style="font-size:12px;color:var(--muted)">by <span style="font-weight:700;color:var(--text3)">@{{ co.curator }}</span></span>
+                </div>
+                <span style="font-size:12px;font-weight:700;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)">{{ co.count }} walls</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+  </div>
+
+  <!-- JOIN CTA BANNER -->
+  <sc-if value="{{ isGuest }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1320px;margin:40px auto 0;padding:0 28px">
+    <div style="background:linear-gradient(135deg,rgba(255,46,99,.14),rgba(139,92,246,.12));border:1px solid rgba(255,46,99,.25);border-radius:20px;padding:32px 36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px">
+      <div>
+        <h3 style="font-family:'Space Grotesk';font-weight:800;font-size:22px;letter-spacing:-.4px;margin-bottom:6px">Join the community</h3>
+        <p style="font-size:14px;color:var(--text3);line-height:1.5;max-width:440px">Create an account to upload wallpapers, join challenges, curate collections and get credits for your work.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex:none">
+        <button onClick="{{ goSignup }}" style="background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-family:'Manrope';font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 4px 16px rgba(255,46,99,.35)">Sign up free</button>
+        <button onClick="{{ goLogin }}" style="background:var(--surface);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:12px 24px;font-family:'Manrope';font-weight:700;font-size:15px;cursor:pointer">Log in</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
 <!-- ================= USER ACCOUNT SETTINGS ================= -->
 <sc-if value="{{ isUserSettings }}" hint-placeholder-val="{{ false }}">
 <div style="min-height:100vh;background:var(--bg);padding-bottom:80px">
@@ -2010,15 +2736,15 @@
     <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line)">
         <div><div style="font-size:14px;font-weight:600">Show wallpaper author on my uploads</div><div style="font-size:12px;color:var(--dim);margin-top:2px">Your name appears on wallpaper detail pages</div></div>
-        <div onClick="{{ toggleShowAuthor }}" style="{{ showAuthorStyle }}"><div style="{{ userPrivacy.showAuthor ? knobOnStyle : knobOffStyle }}"></div></div>
+        <div onClick="{{ toggleShowAuthor }}" style="{{ showAuthorStyle }}"><div style="{{ showAuthorKnobStyle }}"></div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my profile</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my contact info</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my biography</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my downloads</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my favourites</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my wallpapers</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my profile</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my contact info</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my biography</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my downloads</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my favourites</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my wallpapers</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
       </div>
       <button style="align-self:flex-start;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:12px 24px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">Update privacy</button>
     </div>
@@ -2029,15 +2755,15 @@
     <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:0">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--line)">
         <div><div style="font-size:14px;font-weight:600">Someone comments on my wallpapers</div><div style="font-size:12px;color:var(--dim);margin-top:2px">Get an email when a new comment is posted</div></div>
-        <div onClick="{{ toggleCommentNotif }}" style="{{ commentNotifStyle }}"><div style="{{ userNotif.commentNotif ? knobOnStyle : knobOffStyle }}"></div></div>
+        <div onClick="{{ toggleCommentNotif }}" style="{{ commentNotifStyle }}"><div style="{{ commentNotifKnobStyle }}"></div></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--line)">
         <div><div style="font-size:14px;font-weight:600">My wallpaper status changes</div><div style="font-size:12px;color:var(--dim);margin-top:2px">Approved, rejected, or disabled by admin</div></div>
-        <div onClick="{{ toggleStatusNotif }}" style="{{ statusNotifStyle }}"><div style="{{ userNotif.statusNotif ? knobOnStyle : knobOffStyle }}"></div></div>
+        <div onClick="{{ toggleStatusNotif }}" style="{{ statusNotifStyle }}"><div style="{{ statusNotifKnobStyle }}"></div></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0">
         <div><div style="font-size:14px;font-weight:600">New follower</div><div style="font-size:12px;color:var(--dim);margin-top:2px">When someone follows your creator profile</div></div>
-        <div style="width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:var(--track)"><div style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff"></div></div>
+        <div style="width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:var(--surface2);border:1px solid var(--line2)"><div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)"></div></div>
       </div>
       <button style="align-self:flex-start;margin-top:8px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:12px 24px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">Update notifications</button>
     </div>
@@ -2074,7 +2800,7 @@
   <div style="width:100%;max-width:440px;position:relative">
     <!-- logo -->
     <div onClick="{{ goHome }}" style="display:flex;align-items:center;justify-content:center;margin-bottom:30px;cursor:pointer">
-      <img src="./assets/logo.png" alt="HD Wallpapers" class="site-logo" style="height:44px;width:auto;display:block"/>
+      <img src="./assets/logo-light.png" alt="HD Wallpapers" class="site-logo site-logo-light" style="height:44px;width:auto"/><img src="./assets/logo-dark.png" alt="HD Wallpapers" class="site-logo site-logo-dark" style="height:44px;width:auto"/>
     </div>
 
     <!-- card -->
@@ -2279,6 +3005,43 @@ class Component extends DCLogic {
     memberView: 'list', // 'list' | 'add' | 'settings'
     // wallpaper defaults
     wallDefaults: { perPage:15, related:3, resOnSummary:3, featuredCount:3, showPagination:true, thumbW:240, thumbH:135, thumbRatio:'HD 16:9', previewW:480, previewH:270, previewRatio:'HD 16:9', virtualThumb:true, virtualPreview:true },
+    upSelectedCats: ['Nature'],
+    upTagChips: ['aurora','night','4k','nordic'],
+    upTagInput: '',
+    collectionsFilter: 'All',
+    collectionsSort: 'saves',
+    collectionsSearch: '',
+    savedCollections: [2, 8],
+    // admin: collections
+    adminCollectionsSearch: '', adminCollectionsFilter: 'All',
+    adminCollectionFeaturedOverride: {}, adminCollectionStatusOverride: { 4:'pending', 11:'pending' },
+    adminCollectionEdits: {}, adminCollectionDeleted: [], adminCollectionsNew: [],
+    adminCollectionModal: null,
+    // admin: community
+    adminCommunityTab: 'feed', adminFeedFlagged: [2, 5], adminFeedRemoved: [],
+    adminChallengeModal: null,
+    communityTab: 'feed',
+    communityFeed: [
+      { id:1, type:'upload',    user:'Kai Tanaka',   av:11, handle:'kai.t',      title:'Nebula Cascade',   category:'Space',    ts:'2 hours ago',  likes:347,  downloads:1420, verified:true },
+      { id:2, type:'comment',   user:'Studio Mono',  av:24, handle:'studio_mono',wallTitle:'Aurora Fjord', ts:'4 hours ago',  text:'The blues in this are extraordinary — printing it for my studio wall.' },
+      { id:3, type:'upload',    user:'Lena Park',    av:5,  handle:'lenapark',   title:'Midnight Sakura',  category:'Nature',   ts:'6 hours ago',  likes:892,  downloads:3100, verified:true },
+      { id:4, type:'milestone', user:'Cosmo Reyes',  av:13, handle:'cosmo',      milestone:'10,000 downloads milestone reached!', ts:'8 hours ago' },
+      { id:5, type:'upload',    user:'V. Mercer',    av:51, handle:'vmercer',    title:'Grid Dissolve',    category:'Abstract', ts:'12 hours ago', likes:156,  downloads:780 },
+      { id:6, type:'comment',   user:'Niko Berg',    av:60, handle:'nikoberg',   wallTitle:'Stellar Drift',ts:'1 day ago',    text:'Perfect for my ultrawide setup — composition is impeccable.' },
+      { id:7, type:'upload',    user:'Kai Tanaka',   av:11, handle:'kai.t',      title:'Carbon Weave',     category:'Abstract', ts:'1 day ago',    likes:203,  downloads:940, verified:true },
+      { id:8, type:'milestone', user:'Lena Park',    av:5,  handle:'lenapark',   milestone:'Reached 50 published wallpapers!', ts:'2 days ago' },
+    ],
+    communityChallenges: [
+      { id:1, title:'Golden Hour', color:'#f5c518', desc:'Capture the warmth of dusk — sunsets, city lights, amber landscapes.', prize:'Creator badge + homepage feature', entries:84,  deadline:'Jun 30, 2026', active:true },
+      { id:2, title:'Cyberpunk City', color:'#ff2e63', desc:'Neon signs, rain-slicked streets, dystopian skylines after midnight.', prize:'Creator badge + 3 months Pro', entries:127, deadline:'Jul 15, 2026', active:true },
+      { id:3, title:'Deep Ocean', color:'#22d3ee', desc:'Bioluminescent creatures, coral reefs and abyssal trenches in 4K.', prize:'Featured collection + Creator badge', entries:45,  deadline:'Jul 31, 2026', active:false },
+    ],
+    communityCollections: [
+      { id:1, name:'Minimal Workspaces', curator:'studio_mono', curatorAv:24, count:24, desc:'Clean, distraction-free setups for deep work.' },
+      { id:2, name:'Astronomy Archive',  curator:'kai.t',       curatorAv:11, count:38, desc:'Galaxies, nebulae and cosmic phenomena in 4K.' },
+      { id:3, name:'Scandinavian Seasons', curator:'lenapark',  curatorAv:5,  count:19, desc:'Nordic light captured across the four seasons.' },
+      { id:4, name:'Neon Dreamscapes',   curator:'cosmo',       curatorAv:13, count:31, desc:'Electric colour fields and psychedelic visions.' },
+    ],
     category: 'All',
     sort: 'Trending',
     res: 'All',
@@ -2529,6 +3292,21 @@ class Component extends DCLogic {
     { name:'newbie22', handle:'newbie22', av:41, role:'Member', uploads:1, downloads:'2k', status:'Pending', joined:'Jun 2026' },
   ];
 
+  COLLECTIONS = [
+    { id:1,  name:'Minimal Workspaces',    curator:'studio_mono', curatorAv:24, count:24, saves:1840, views:12400, category:'Abstract',     featured:true,  desc:'Clean, distraction-free desktop setups for deep work sessions.' },
+    { id:2,  name:'Astronomy Archive',     curator:'kai.t',       curatorAv:11, count:38, saves:3200, views:28600, category:'Space',         featured:true,  desc:'Galaxies, nebulae and cosmic phenomena photographed in 4K.' },
+    { id:3,  name:'Scandinavian Seasons',  curator:'lenapark',    curatorAv:5,  count:19, saves:2100, views:16800, category:'Nature',        featured:true,  desc:'Nordic light captured across all four seasons in stunning clarity.' },
+    { id:4,  name:'Neon Dreamscapes',      curator:'cosmo',       curatorAv:13, count:31, saves:2780, views:21500, category:'Abstract',     featured:false, desc:'Electric colour fields and psychedelic visions in vivid 4K.' },
+    { id:5,  name:'JDM Culture',           curator:'vmercer',     curatorAv:51, count:22, saves:1560, views:9800,  category:'Cars',          featured:false, desc:'Japanese domestic market legends — from Skylines to Supras.' },
+    { id:6,  name:'Brutalist Architecture',curator:'nikoberg',    curatorAv:60, count:17, saves:980,  views:7200,  category:'Architecture',  featured:false, desc:'Stark concrete geometry from the golden age of Brutalism.' },
+    { id:7,  name:'Ocean Depths',          curator:'lenapark',    curatorAv:5,  count:28, saves:2340, views:18200, category:'Nature',        featured:false, desc:'From sunlit coral reefs to the abyssal darkness of the deep sea.' },
+    { id:8,  name:'Retro Synthwave',       curator:'cosmo',       curatorAv:13, count:45, saves:4100, views:34700, category:'Abstract',     featured:false, desc:'80s-inspired grid horizons, chrome text and sunset gradients.' },
+    { id:9,  name:'Mountain Dawns',        curator:'kai.t',       curatorAv:11, count:33, saves:2890, views:22400, category:'Nature',        featured:false, desc:'Alpine peaks catching first light across continents.' },
+    { id:10, name:'Hypercar Gallery',      curator:'vmercer',     curatorAv:51, count:29, saves:3400, views:26000, category:'Cars',          featured:false, desc:'The world\'s rarest supercars at the absolute limit of detail.' },
+    { id:11, name:'Lo-Fi Nights',          curator:'studio_mono', curatorAv:24, count:18, saves:1120, views:8900,  category:'Abstract',     featured:false, desc:'Cosy pixel art, warm neon glows and late-night café vibes.' },
+    { id:12, name:'Macro World',           curator:'lenapark',    curatorAv:5,  count:14, saves:760,  views:5400,  category:'Nature',        featured:false, desc:'Tiny worlds revealed through extreme close-up photography.' },
+  ];
+
   MONTHS = [
     { m:'Jul', v:38 },{ m:'Aug', v:46 },{ m:'Sep', v:52 },{ m:'Oct', v:49 },
     { m:'Nov', v:61 },{ m:'Dec', v:74 },{ m:'Jan', v:68 },{ m:'Feb', v:77 },
@@ -2653,6 +3431,33 @@ class Component extends DCLogic {
   setDetailTab = (tab) => this.setState({ detailTab: tab });
   // user settings
   goUserSettings = (tab) => { window.scrollTo(0,0); this.setState({ screen:'usersettings', userSettingsTab: tab||'profile' }); };
+  // upload: multi-select categories
+  toggleUpCat = (cat) => this.setState(s => {
+    const sel = s.upSelectedCats || [];
+    return { upSelectedCats: sel.includes(cat) ? sel.filter(c => c !== cat) : [...sel, cat] };
+  });
+  // upload: tag chips
+  setUpTagInput = (e) => this.setState({ upTagInput: e.target.value });
+  addUpTag = (e) => {
+    if (e.key !== 'Enter' && e.key !== ',') return;
+    e.preventDefault();
+    const val = (this.state.upTagInput || '').trim().replace(/^#/, '').replace(/,+$/, '');
+    if (!val) return;
+    this.setState(s => ({
+      upTagChips: [...new Set([...(s.upTagChips||[]), val.toLowerCase()])],
+      upTagInput: '',
+    }));
+  };
+  removeUpTag = (tag) => this.setState(s => ({ upTagChips: (s.upTagChips||[]).filter(t => t !== tag) }));
+
+  goCollections = () => { window.scrollTo(0,0); this.setState({ screen:'collections' }); };
+  setCollectionsFilter = (f) => this.setState({ collectionsFilter: f });
+  setCollectionsSort = (sv) => this.setState({ collectionsSort: sv });
+  setCollectionsSearch = (e) => this.setState({ collectionsSearch: e.target.value });
+  clearCollectionsSearch = () => this.setState({ collectionsSearch: '' });
+  toggleSaveCollection = (id) => this.setState(s => { const sv=s.savedCollections||[]; return { savedCollections: sv.includes(id)?sv.filter(x=>x!==id):[...sv,id] }; });
+  goCommunity = () => { window.scrollTo(0,0); this.setState({ screen:'community' }); };
+  setCommunityTab = (t) => this.setState({ communityTab: t });
   setUserSettingsTab = (t) => this.setState({ userSettingsTab: t });
   setPrivacy = (k,v) => this.setState(s => ({ userPrivacy: { ...s.userPrivacy, [k]: v } }));
   setNotif = (k,v) => this.setState(s => ({ userNotif: { ...s.userNotif, [k]: v } }));
@@ -2875,10 +3680,63 @@ class Component extends DCLogic {
     this.flash(action === 'approve' ? 'Wallpaper approved & published' : 'Submission rejected');
   }
 
+  // admin: collections
+  setAdminCollectionsSearch = (e) => this.setState({ adminCollectionsSearch: e.target.value });
+  setAdminCollectionsFilter = (f) => this.setState({ adminCollectionsFilter: f });
+  toggleFeatureCollection = (id, current) => { this.setState(s => ({ adminCollectionFeaturedOverride: { ...s.adminCollectionFeaturedOverride, [id]: !current } })); this.flash(!current ? 'Collection featured' : 'Collection unfeatured'); };
+  deleteCollectionAdmin = (id, name) => { this.setState(s => ({ adminCollectionDeleted: [...s.adminCollectionDeleted, id] })); this.flash(`Collection "${name}" deleted`); };
+  openNewCollectionModal = () => this.setState({ adminCollectionModal: { mode:'new', id:null, name:'', category:'Nature', desc:'', featured:false } });
+  openEditCollectionModal = (col) => this.setState({ adminCollectionModal: { mode:'edit', id:col.id, name:col.name, category:col.category, desc:col.desc, featured:col.featured } });
+  closeCollectionModal = () => this.setState({ adminCollectionModal: null });
+  setCollectionModalName = (e) => this.setState(s => ({ adminCollectionModal: { ...s.adminCollectionModal, name: e.target.value } }));
+  setCollectionModalDesc = (e) => this.setState(s => ({ adminCollectionModal: { ...s.adminCollectionModal, desc: e.target.value } }));
+  setCollectionModalCategory = (cat) => this.setState(s => ({ adminCollectionModal: { ...s.adminCollectionModal, category: cat } }));
+  toggleCollectionModalFeatured = () => this.setState(s => ({ adminCollectionModal: { ...s.adminCollectionModal, featured: !s.adminCollectionModal.featured } }));
+  saveCollectionModal = () => {
+    const m = this.state.adminCollectionModal;
+    if (!m) return;
+    if (!m.name || !m.name.trim()) { this.flash('Enter a collection name'); return; }
+    if (m.mode === 'new') {
+      const id = 2000 + Math.floor(Math.random()*9000);
+      this.setState(s => ({ adminCollectionsNew: [...s.adminCollectionsNew, { id, name:m.name.trim(), curator:'admin', curatorAv:1, count:0, saves:0, views:0, category:m.category, featured:m.featured, desc:m.desc||'' }], adminCollectionModal:null }));
+      this.flash(`Collection "${m.name.trim()}" created`);
+    } else {
+      this.setState(s => ({
+        adminCollectionFeaturedOverride: { ...s.adminCollectionFeaturedOverride, [m.id]: m.featured },
+        adminCollectionEdits: { ...s.adminCollectionEdits, [m.id]: { name:m.name.trim(), category:m.category, desc:m.desc } },
+        adminCollectionModal: null,
+      }));
+      this.flash('Collection updated');
+    }
+  };
+
+  // admin: community
+  setAdminCommunityTab = (t) => this.setState({ adminCommunityTab: t });
+  approveFeedItem = (id) => { this.setState(s => ({ adminFeedFlagged: (s.adminFeedFlagged||[]).filter(x => x !== id) })); this.flash('Post approved'); };
+  removeFeedItem = (id) => { this.setState(s => ({ adminFeedRemoved: [...s.adminFeedRemoved, id] })); this.flash('Post removed'); };
+  openNewChallengeModal = () => this.setState({ adminChallengeModal: { mode:'new', id:null, title:'', color:'#ff2e63', desc:'', prize:'', deadline:'' } });
+  openEditChallengeModal = (ch) => this.setState({ adminChallengeModal: { mode:'edit', id:ch.id, title:ch.title, color:ch.color, desc:ch.desc, prize:ch.prize, deadline:ch.deadline } });
+  closeChallengeModal = () => this.setState({ adminChallengeModal: null });
+  setChallengeModalField = (field, e) => this.setState(s => ({ adminChallengeModal: { ...s.adminChallengeModal, [field]: e.target.value } }));
+  setChallengeModalColor = (color) => this.setState(s => ({ adminChallengeModal: { ...s.adminChallengeModal, color } }));
+  saveChallengeModal = () => {
+    const m = this.state.adminChallengeModal;
+    if (!m) return;
+    if (!m.title || !m.title.trim()) { this.flash('Enter a challenge title'); return; }
+    if (m.mode === 'new') {
+      this.setState(s => ({ communityChallenges: [...s.communityChallenges, { id: Date.now(), title:m.title.trim(), color:m.color, desc:m.desc||'', prize:m.prize||'', entries:0, deadline:m.deadline||'TBD' }], adminChallengeModal:null }));
+      this.flash(`Challenge "${m.title.trim()}" created`);
+    } else {
+      this.setState(s => ({ communityChallenges: s.communityChallenges.map(c => c.id===m.id ? { ...c, title:m.title.trim(), color:m.color, desc:m.desc, prize:m.prize, deadline:m.deadline } : c), adminChallengeModal:null }));
+      this.flash('Challenge updated');
+    }
+  };
+  deleteChallengeAdmin = (id, title) => { this.setState(s => ({ communityChallenges: s.communityChallenges.filter(c => c.id !== id) })); this.flash(`Challenge "${title}" deleted`); };
+
   renderVals() {
     const s = this.state;
     const screen = s.screen;
-    const ADMIN_SCREENS = ['admin','moderation','adminwall','users','categories','analytics','settings','admembers','admwallsettings'];
+    const ADMIN_SCREENS = ['admin','moderation','adminwall','admcollections','admcommunity','users','categories','analytics','settings','admembers','admwallsettings'];
     const isAdminArea = ADMIN_SCREENS.includes(screen);
     const hideHeader = isAdminArea || screen === 'auth';
     const raw = this.filteredRaw();
@@ -2956,6 +3814,7 @@ class Component extends DCLogic {
     const jumperItems = [
       { k:'home', label:'Browse' }, { k:'detail', label:'Detail' }, { k:'upload', label:'Upload' },
       { k:'profile', label:'Profile' }, { k:'usersettings', label:'Acct Settings' }, { k:'shortlist', label:'Shortlist' },
+      { k:'community', label:'Community' },
       { k:'auth', label:'Login' }, { k:'admin', label:'Admin' }, { k:'moderation', label:'Moderation' },
     ];
     const jumper = jumperItems.map(j => {
@@ -3020,6 +3879,8 @@ class Component extends DCLogic {
       {k:'dashboard', label:'Dashboard', scr:'admin', icon:'dashboard'},
       {k:'moderation', label:'Moderation', scr:'moderation', badge:pendingCount, icon:'moderation'},
       {k:'wallpapers', label:'Wallpapers', scr:'adminwall', icon:'wallpapers'},
+      {k:'admcollections', label:'Collections', scr:'admcollections', icon:'collections'},
+      {k:'admcommunity', label:'Community', scr:'admcommunity', icon:'community'},
       {k:'users', label:'Users', scr:'users', icon:'users'},
       {k:'admembers', label:'Member Settings', scr:'admembers', icon:'members'},
       {k:'categories', label:'Categories', scr:'categories', icon:'categories'},
@@ -3066,8 +3927,8 @@ class Component extends DCLogic {
     const resList = s.resPresets.map((r,i) => { const c = RES_COLORS[i % RES_COLORS.length];
       return { ...r, dims:`${r.w} × ${r.h}`, size:this.resSize(r.w, r.h),
         badgeStyle:`background:${c}22;color:${c};border:1px solid ${c}66;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:700;white-space:nowrap`,
-        trackStyle:`width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s;background:${r.enabled?'#30a46c':'var(--track)'};flex:none`,
-        knobStyle:`position:absolute;top:2px;left:${r.enabled?'20px':'2px'};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)`,
+        trackStyle:`width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${r.enabled?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${r.enabled?'transparent':'var(--line2)'};box-shadow:${r.enabled?'0 0 0 3px rgba(255,46,99,.15)':'none'};flex:none`,
+        knobStyle:`position:absolute;top:3px;left:${r.enabled?'23px':'3px'};width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)`,
         toggle:()=>this.toggleRes(r.id), del:()=>this.deleteRes(r.id) }; });
     const enabledResCount = s.resPresets.filter(r => r.enabled).length;
 
@@ -3084,14 +3945,112 @@ class Component extends DCLogic {
 
     return {
       isPublic: !hideHeader,
+      isCollections: screen === 'collections',
       isHome: screen === 'home', isDetail: screen === 'detail', isUpload: screen === 'upload',
       isProfile: screen === 'profile', isAdminArea,
       isAuth: s.screen === 'auth', isShortlist: s.screen === 'shortlist',
       isUserSettings: screen === 'usersettings',
+      isCommunity: screen === 'community',
+      goCollections: this.goCollections,
+      goCommunity: this.goCommunity,
+      // collections
+      collectionsSearch: s.collectionsSearch, setCollectionsSearch: this.setCollectionsSearch, clearCollectionsSearch: this.clearCollectionsSearch,
+      collectionsHasSearch: !!(s.collectionsSearch||'').trim(),
+      collectionsFilterAll: !!(s.collectionsFilter==='All'),
+      collectionsFilterItems: ['All','Nature','Space','Abstract','Cars','Architecture'].map(f=>({ label:f, active:s.collectionsFilter===f, select:()=>this.setCollectionsFilter(f), style:`height:32px;padding:0 15px;border-radius:999px;font-size:13px;font-weight:${s.collectionsFilter===f?'700':'500'};cursor:pointer;border:1px solid;border-color:${s.collectionsFilter===f?'#ff2e63':'var(--line)'};color:${s.collectionsFilter===f?'#ff2e63':'var(--muted)'};background:${s.collectionsFilter===f?'rgba(255,46,99,.1)':'var(--surface)'}` })),
+      collectionsSortItems: [{k:'saves',l:'Most Saved'},{k:'views',l:'Most Viewed'},{k:'count',l:'Most Wallpapers'}].map(si=>{ const on=s.collectionsSort===si.k; return { ...si, active:on, select:()=>this.setCollectionsSort(si.k), btnStyle:`height:28px;padding:0 12px;border-radius:8px;font-family:'Manrope';font-size:12px;font-weight:600;cursor:pointer;border:none;background:${on?'var(--surface2)':'transparent'};color:${on?'var(--text)':'var(--muted)'}` }; }),
+      collectionsList: (() => {
+        const q=(s.collectionsSearch||'').trim().toLowerCase();
+        const SEEDS=['aurora','space1','nat1','cyber1','car1','arch1','nat2','retro1','nat3','car2','lo1','macro1'];
+        const CATS={Nature:'#30a46c',Space:'#22d3ee',Abstract:'#8b5cf6',Cars:'#f5c518',Architecture:'#ff7a45'};
+        let list=this.COLLECTIONS.filter(c=>{
+          if(s.collectionsFilter!=='All'&&c.category!==s.collectionsFilter) return false;
+          if(q&&!c.name.toLowerCase().includes(q)&&!c.curator.toLowerCase().includes(q)&&!c.category.toLowerCase().includes(q)) return false;
+          return true;
+        });
+        if(s.collectionsSort==='saves') list=[...list].sort((a,b)=>b.saves-a.saves);
+        else if(s.collectionsSort==='views') list=[...list].sort((a,b)=>b.views-a.views);
+        else if(s.collectionsSort==='count') list=[...list].sort((a,b)=>b.count-a.count);
+        const saved=s.savedCollections||[];
+        return list.map((c,i)=>{
+          const col=CATS[c.category]||'#9a9aa3';
+          const isSaved=saved.includes(c.id);
+          return { ...c,
+            catColor:col, catStyle:`background:${col}18;color:${col};border:1px solid ${col}44;padding:3px 9px;border-radius:6px;font-size:10.5px;font-weight:700`,
+            isSaved, savedStyle:`width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid;border-color:${isSaved?'#ff2e63':'var(--line)'};background:${isSaved?'rgba(255,46,99,.13)':'var(--surface3)'};color:${isSaved?'#ff2e63':'var(--muted)'}`,
+            savesF:this.fmt(c.saves), viewsF:this.fmt(c.views),
+            curatorAvatar:this.avatar(c.curatorAv),
+            thumb1:`https://picsum.photos/seed/${SEEDS[i%SEEDS.length]}/280/180`,
+            thumb2:`https://picsum.photos/seed/${SEEDS[(i+4)%SEEDS.length]}/140/180`,
+            thumb3:`https://picsum.photos/seed/${SEEDS[(i+8)%SEEDS.length]}/140/180`,
+            open:()=>this.flash(`Opening "${c.name}"`),
+            toggleSave:()=>this.toggleSaveCollection(c.id),
+          };
+        });
+      })(),
+      collectionsCount: (() => {
+        const q=(s.collectionsSearch||'').trim().toLowerCase();
+        return this.COLLECTIONS.filter(c=>(s.collectionsFilter==='All'||c.category===s.collectionsFilter)&&(!q||c.name.toLowerCase().includes(q)||c.curator.toLowerCase().includes(q))).length;
+      })(),
+      collectionsFeatured: (() => {
+        const SEEDS=['aurora','space1','nat1','cyber1','car1','arch1'];
+        const CATS={Nature:'#30a46c',Space:'#22d3ee',Abstract:'#8b5cf6',Cars:'#f5c518',Architecture:'#ff7a45'};
+        return this.COLLECTIONS.filter(c=>c.featured).map((c,i)=>{
+          const col=CATS[c.category]||'#9a9aa3';
+          return { ...c, catColor:col, catStyle:`background:${col}22;color:${col};padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700`,
+            savesF:this.fmt(c.saves), viewsF:this.fmt(c.views),
+            curatorAvatar:this.avatar(c.curatorAv),
+            heroThumb:`https://picsum.photos/seed/${SEEDS[i]}/900/420`,
+            open:()=>this.flash(`Opening "${c.name}"`),
+          };
+        });
+      })(),
+      // community tabs
+      communityTab: s.communityTab,
+      isComFeed: s.communityTab==='feed', isComCreators: s.communityTab==='creators',
+      isComChallenges: s.communityTab==='challenges', isComCollections: s.communityTab==='collections',
+      setComFeed: ()=>this.setCommunityTab('feed'), setComCreators: ()=>this.setCommunityTab('creators'),
+      setComChallenges: ()=>this.setCommunityTab('challenges'), setComCollections: ()=>this.setCommunityTab('collections'),
+      comTabFeedStyle: `display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;background:${s.communityTab==='feed'?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface)'};color:${s.communityTab==='feed'?'#fff':'var(--muted)'};${s.communityTab==='feed'?'box-shadow:0 4px 14px rgba(255,46,99,.3)':'border:1px solid var(--line)'}`,
+      comTabCreatorsStyle: `display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;background:${s.communityTab==='creators'?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface)'};color:${s.communityTab==='creators'?'#fff':'var(--muted)'};${s.communityTab==='creators'?'box-shadow:0 4px 14px rgba(255,46,99,.3)':'border:1px solid var(--line)'}`,
+      comTabChallengesStyle: `display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;background:${s.communityTab==='challenges'?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface)'};color:${s.communityTab==='challenges'?'#fff':'var(--muted)'};${s.communityTab==='challenges'?'box-shadow:0 4px 14px rgba(255,46,99,.3)':'border:1px solid var(--line)'}`,
+      comTabCollectionsStyle: `display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;background:${s.communityTab==='collections'?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface)'};color:${s.communityTab==='collections'?'#fff':'var(--muted)'};${s.communityTab==='collections'?'box-shadow:0 4px 14px rgba(255,46,99,.3)':'border:1px solid var(--line)'}`,
+      // community feed
+      communityFeedItems: s.communityFeed.map(item => {
+        const TYPE = { upload:{bg:'rgba(255,46,99,.13)',col:'#ff6a8a',path:'M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',lbl:'Uploaded'}, comment:{bg:'rgba(34,211,238,.12)',col:'#22d3ee',path:'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',lbl:'Commented'}, milestone:{bg:'rgba(245,197,24,.13)',col:'#f5c518',path:'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',lbl:'Achievement'} };
+        const t = TYPE[item.type]||TYPE.upload;
+        return { ...item, avatar:this.avatar(item.av), thumbUrl:`https://picsum.photos/seed/cf${item.id}/220/124`, typeIconBg:t.bg, typeIconCol:t.col, typeIconPath:t.path, typeLabel:t.lbl, isUpload:item.type==='upload', isComment:item.type==='comment', isMilestone:item.type==='milestone', likesF:this.fmt(item.likes||0), dlF:this.fmt(item.downloads||0) };
+      }),
+      // community challenges
+      communityChallenges: s.communityChallenges.map(c => ({
+        ...c,
+        cardBorderStyle:`border:1.5px solid ${c.color}44;border-radius:16px;overflow:hidden`,
+        headerBg:`background:linear-gradient(135deg,${c.color}1a,${c.color}08)`,
+        accentColor: c.color,
+        pillStyle:`background:${c.color}22;color:${c.color};border:1px solid ${c.color}44;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.4px`,
+        activePillStyle:c.active?'background:rgba(48,164,108,.15);color:#30a46c;border:1px solid rgba(48,164,108,.3);padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700':'background:rgba(245,197,24,.15);color:#f5c518;border:1px solid rgba(245,197,24,.3);padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700',
+        activeBadge:c.active?'ACTIVE':'UPCOMING',
+        th1:`https://picsum.photos/seed/ch${c.id}a/120/68`, th2:`https://picsum.photos/seed/ch${c.id}b/120/68`, th3:`https://picsum.photos/seed/ch${c.id}c/120/68`,
+      })),
+      // community collections
+      communityCollections: s.communityCollections.map(c => ({
+        ...c,
+        curatorAvatar: this.avatar(c.curatorAv),
+        th1:`https://picsum.photos/seed/cl${c.id}a/220/124`,
+        th2:`https://picsum.photos/seed/cl${c.id}b/110/124`,
+        th3:`https://picsum.photos/seed/cl${c.id}c/110/62`,
+        th4:`https://picsum.photos/seed/cl${c.id}d/110/62`,
+      })),
+      // top creators leaderboard
+      communityLeaderboard: this.USERS.filter(u=>u.role==='Creator').slice(0,5).map((u,i)=>({
+        ...u, avatar:this.avatar(u.av), rank:i+1,
+        rankStyle:i===0?'background:linear-gradient(135deg,#f5c518,#ffaa00);color:#1a1000;font-weight:800;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none':i===1?'background:var(--surface3);color:var(--text3);font-weight:700;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none':i===2?'background:rgba(205,127,50,.2);color:#cd7f32;font-weight:700;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none':'background:transparent;color:var(--dim2);font-weight:600;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none',
+      })),
       isAdmin: screen === 'admin', isModeration: screen === 'moderation',
       isUsers: screen === 'users', isCategories: screen === 'categories',
       isAnalytics: screen === 'analytics', isSettings: screen === 'settings',
       isAdminWall: screen === 'adminwall',
+      isAdmCollections: screen === 'admcollections', isAdmCommunity: screen === 'admcommunity',
       isAdmembers: screen === 'admembers', isAdmWallSettings: screen === 'admwallsettings',
       // user settings
       isUserSettings: screen === 'usersettings',
@@ -3111,11 +4070,15 @@ class Component extends DCLogic {
       toggleShowAuthor: ()=>this.setPrivacy('showAuthor',!s.userPrivacy.showAuthor),
       toggleCommentNotif: ()=>this.setNotif('commentNotif',!s.userNotif.commentNotif),
       toggleStatusNotif: ()=>this.setNotif('statusNotif',!s.userNotif.statusNotif),
-      showAuthorStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.userPrivacy.showAuthor?'#30a46c':'var(--track)'}`,
-      commentNotifStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.userNotif.commentNotif?'#30a46c':'var(--track)'}`,
-      statusNotifStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.userNotif.statusNotif?'#30a46c':'var(--track)'}`,
-      knobOnStyle: 'position:absolute;top:2px;left:20px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s',
-      knobOffStyle: 'position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s',
+      showAuthorStyle: `flex:none;width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.userPrivacy.showAuthor?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.userPrivacy.showAuthor?'transparent':'var(--line2)'};box-shadow:${s.userPrivacy.showAuthor?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+      commentNotifStyle: `flex:none;width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.userNotif.commentNotif?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.userNotif.commentNotif?'transparent':'var(--line2)'};box-shadow:${s.userNotif.commentNotif?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+      statusNotifStyle: `flex:none;width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.userNotif.statusNotif?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.userNotif.statusNotif?'transparent':'var(--line2)'};box-shadow:${s.userNotif.statusNotif?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+      knobOnStyle: 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      knobOffStyle: 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      wdPaginationKnobStyle: s.wallDefaults.showPagination ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      showAuthorKnobStyle: s.userPrivacy.showAuthor ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      commentNotifKnobStyle: s.userNotif.commentNotif ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      statusNotifKnobStyle: s.userNotif.statusNotif ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
       // admin settings sub-nav
       adminSettingsSection: s.adminSettingsSection,
       setAdminSection: (sec)=>()=>this.setAdminSettingsSection(sec),
@@ -3164,11 +4127,16 @@ class Component extends DCLogic {
       setAMPass: (e)=>this.setAddMemberForm('password',e), setAMStatus: (e)=>this.setAddMemberForm('status',e),
       setAMRole: (e)=>this.setAddMemberForm('role',e),
       toggleMS: (k)=>()=>this.setMemberSetting(k,!s.memberSettings[k]),
-      canRegisterStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canRegister?'#30a46c':'var(--track)'}`,
-      reqConfStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.requireConfirmation?'#30a46c':'var(--track)'}`,
-      canSubmitStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canSubmit?'#30a46c':'var(--track)'}`,
-      canCommentStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canComment?'#30a46c':'var(--track)'}`,
-      modCommentStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.moderateComments?'#30a46c':'var(--track)'}`,
+      canRegisterStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canRegister?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.canRegister?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.canRegister?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      reqConfStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.requireConfirmation?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.requireConfirmation?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.requireConfirmation?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      canSubmitStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canSubmit?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.canSubmit?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.canSubmit?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      canCommentStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canComment?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.canComment?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.canComment?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      modCommentStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.moderateComments?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.moderateComments?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.moderateComments?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      canRegisterKnob: `position:absolute;top:3px;left:${s.memberSettings.canRegister?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
+      reqConfKnob: `position:absolute;top:3px;left:${s.memberSettings.requireConfirmation?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
+      canSubmitKnob: `position:absolute;top:3px;left:${s.memberSettings.canSubmit?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
+      canCommentKnob: `position:absolute;top:3px;left:${s.memberSettings.canComment?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
+      modCommentKnob: `position:absolute;top:3px;left:${s.memberSettings.moderateComments?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
       // wallpaper defaults
       wallDefaults: s.wallDefaults,
       setWDPerPage: (e)=>this.setWallDefault('perPage',e), setWDRelated: (e)=>this.setWallDefault('related',e),
@@ -3176,7 +4144,7 @@ class Component extends DCLogic {
       setWDThumbW: (e)=>this.setWallDefault('thumbW',e), setWDThumbH: (e)=>this.setWallDefault('thumbH',e),
       setWDPreviewW: (e)=>this.setWallDefault('previewW',e), setWDPreviewH: (e)=>this.setWallDefault('previewH',e),
       toggleWDPagination: ()=>this.setWallDefault('showPagination',!s.wallDefaults.showPagination),
-      wdPaginationStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.wallDefaults.showPagination?'#30a46c':'var(--track)'}`,
+      wdPaginationStyle: `flex:none;width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.wallDefaults.showPagination?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.wallDefaults.showPagination?'transparent':'var(--line2)'};box-shadow:${s.wallDefaults.showPagination?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
       showAds: this.props.showAds ?? true,
       goHome: this.goHome, goUpload: this.goUpload, goProfile: this.goProfile,
       hero, grid, cats, resChips, colors, sorts, jumper, active,
@@ -3193,9 +4161,10 @@ class Component extends DCLogic {
         return this.WALLS.filter(w=>w.title.toLowerCase().includes(q)||w.category.toLowerCase().includes(q)).slice(0,4).map(w=>this.decorate(w));
       })(),
       megaCats: (() => {
+        const MCOLS=['#30a46c','#8b5cf6','#f5c518','#22d3ee','#ff7a45','#ff2e63','#6366f1'];
         const q = (s.searchQuery||'').trim().toLowerCase();
-        const all = [{ name:'Nature', count:248 },{ name:'Abstract', count:192 },{ name:'Cars', count:164 },{ name:'Space', count:137 },{ name:'Anime', count:121 },{ name:'Cyberpunk', count:86 },{ name:'Minimal', count:142 },{ name:'Architecture', count:98 },{ name:'Animals', count:73 },{ name:'Games', count:110 }];
-        return (q ? all.filter(c=>c.name.toLowerCase().includes(q)) : all).slice(0,5).map(c=>({ ...c, select:()=>{ this.setCategory(c.name); this.setState({searchFocused:false}); } }));
+        const all = [{ name:'Nature', count:248 },{ name:'Abstract', count:192 },{ name:'Cars', count:164 },{ name:'Space', count:137 },{ name:'Anime', count:121 },{ name:'Cyberpunk', count:86 },{ name:'Minimal', count:142 }];
+        return (q ? all.filter(c=>c.name.toLowerCase().includes(q)) : all).slice(0,7).map((c,i)=>{ const col=MCOLS[i%MCOLS.length]; return { ...c, dotStyle:`width:8px;height:8px;border-radius:50%;flex:none;background:${col}`, select:()=>{ this.setCategory(c.name); this.setState({searchFocused:false}); } }; });
       })(),
       megaTags: (() => {
         const q = (s.searchQuery||'').trim().toLowerCase();
@@ -3208,7 +4177,9 @@ class Component extends DCLogic {
         return (q ? all.filter(u=>u.name.toLowerCase().includes(q)||u.handle.toLowerCase().includes(q)) : all).slice(0,4).map(u=>({ ...u, avatar:this.avatar(u.av), select:()=>{ this.setState({searchFocused:false}); } }));
       })(),
       megaHasQ: !!(s.searchQuery||'').trim(),
+      megaNoQ: !(s.searchQuery||'').trim(),
       megaSearchLabel: (s.searchQuery||'').trim() ? `Results for "${(s.searchQuery||'').trim()}"` : 'Trending searches',
+      megaTrendingChips: ['Aurora Borealis','Cyberpunk City','Deep Space','Mountain Dawn','Neon Minimal','Abstract Fluid','Dark Forest'].map(label=>({ label, select:()=>this.setState({searchQuery:label,searchFocused:true,page:1,category:'All'}) })),
       // sort tab icons
       sortIconExplore: this.ICONS.explore,
       sortIconCollections: this.ICONS.collections,
@@ -3288,6 +4259,21 @@ class Component extends DCLogic {
         optStyle:`display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer;font-size:13.5px;font-weight:${l.id===s.upLicenseId?'700':'500'};color:${l.id===s.upLicenseId?'#ff2e63':'var(--text)'};background:${l.id===s.upLicenseId?'rgba(255,46,99,.08)':'transparent'}` })),
       upHasImage: s.upStage !== 'empty',
       upNoImage: s.upStage === 'empty',
+      // multi-select categories
+      upCategoryChips: ['Nature','Space','Abstract','Cars','Architecture','Cyberpunk','Minimal','Animals','Games','Anime','Retro'].map(cat => {
+        const on = (s.upSelectedCats||[]).includes(cat);
+        return { cat, on, toggle: () => this.toggleUpCat(cat),
+          style: `padding:7px 13px;border-radius:9px;font-size:13px;font-weight:${on?'700':'500'};cursor:pointer;border:1px solid;border-color:${on?'#ff2e63':'var(--line)'};color:${on?'#ff2e63':'var(--muted)'};background:${on?'rgba(255,46,99,.1)':'var(--surface2)'}` };
+      }),
+      upSelectedCatCount: (s.upSelectedCats||[]).length,
+      upHasCats: (s.upSelectedCats||[]).length > 0,
+      upSelectedCatLabel: (s.upSelectedCats||[]).length === 0 ? 'None selected' : (s.upSelectedCats||[]).join(', '),
+      // tag chips
+      upTagChips: (s.upTagChips||[]).map(t => ({ t, remove: () => this.removeUpTag(t) })),
+      upTagInput: s.upTagInput || '',
+      setUpTagInput: this.setUpTagInput,
+      addUpTag: this.addUpTag,
+      upHasTags: (s.upTagChips||[]).length > 0,
       // resolution selector (shown in dropzone)
       upResSelector: s.resPresets.filter(r => r.enabled).map(r => {
         const selectedIds = s.upSelectedRes;
@@ -3394,6 +4380,102 @@ class Component extends DCLogic {
       bulkDelete: this.bulkDelete,
       // admin
       kpiPending: pendingCount, weekly, topCats, activity, pending, adminNav, goAdmin,
+      // ---- admin: collections ----
+      adminCollectionsSearch: s.adminCollectionsSearch, setAdminCollectionsSearch: this.setAdminCollectionsSearch,
+      openNewCollectionModal: this.openNewCollectionModal, closeCollectionModal: this.closeCollectionModal,
+      setCollectionModalName: this.setCollectionModalName, setCollectionModalDesc: this.setCollectionModalDesc,
+      toggleCollectionModalFeatured: this.toggleCollectionModalFeatured, saveCollectionModal: this.saveCollectionModal,
+      adminCollectionsFilterTabs: ['All','Featured','Pending','Published'].map(f => {
+        const on = s.adminCollectionsFilter === f;
+        return { label:f, select:()=>this.setAdminCollectionsFilter(f),
+          style:`padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;background:${on?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'transparent'};color:${on?'#fff':'var(--muted)'}` };
+      }),
+      adminCollectionsRows: (() => {
+        const CATS={Nature:'#30a46c',Space:'#22d3ee',Abstract:'#8b5cf6',Cars:'#f5c518',Architecture:'#ff7a45'};
+        const SEEDS=['aurora','space1','nat1','cyber1','car1','arch1','nat2','retro1','nat3','car2','lo1','macro1'];
+        const base = this.COLLECTIONS.map((c,i) => ({ ...c, thumbSeed: SEEDS[i%SEEDS.length] }));
+        const all = [...base, ...s.adminCollectionsNew.map((c,i) => ({ ...c, thumbSeed: SEEDS[(i+3)%SEEDS.length] }))]
+          .filter(c => !s.adminCollectionDeleted.includes(c.id));
+        const q = (s.adminCollectionsSearch||'').trim().toLowerCase();
+        return all.filter(c => {
+          const featured = s.adminCollectionFeaturedOverride[c.id] !== undefined ? s.adminCollectionFeaturedOverride[c.id] : c.featured;
+          const status = s.adminCollectionStatusOverride[c.id] || (featured ? 'Featured' : 'Published');
+          if (s.adminCollectionsFilter === 'Featured' && !featured) return false;
+          if (s.adminCollectionsFilter === 'Pending' && status !== 'pending') return false;
+          if (s.adminCollectionsFilter === 'Published' && (status === 'pending' || featured)) return false;
+          if (q && !c.name.toLowerCase().includes(q) && !c.curator.toLowerCase().includes(q)) return false;
+          return true;
+        }).map(c => {
+          const edit = s.adminCollectionEdits[c.id] || {};
+          const name = edit.name || c.name, category = edit.category || c.category, desc = edit.desc !== undefined ? edit.desc : c.desc;
+          const featured = s.adminCollectionFeaturedOverride[c.id] !== undefined ? s.adminCollectionFeaturedOverride[c.id] : c.featured;
+          const statusRaw = s.adminCollectionStatusOverride[c.id] || (featured ? 'featured' : 'published');
+          const STATUS_COL = { pending:'#f5c518', featured:'#ff2e63', published:'#30a46c' };
+          const col = CATS[category]||'#9a9aa3';
+          return { ...c, name, category, desc, featured,
+            statusLabel: statusRaw==='pending'?'Pending review':statusRaw==='featured'?'Featured':'Published',
+            statusStyle: `color:${STATUS_COL[statusRaw]};background:${STATUS_COL[statusRaw]}1f;border:1px solid ${STATUS_COL[statusRaw]}44;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:700`,
+            catStyle: `background:${col}18;color:${col};border:1px solid ${col}44;padding:3px 9px;border-radius:6px;font-size:10.5px;font-weight:700`,
+            savesF: this.fmt(c.saves||0), curatorAvatar: this.avatar(c.curatorAv),
+            thumb: `https://picsum.photos/seed/${c.thumbSeed}/120/68`,
+            featureBtnStyle: `width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:${featured?'#f5c518':'var(--dim2)'};border:1px solid ${featured?'#f5c51855':'var(--line)'};background:${featured?'rgba(245,197,24,.1)':'transparent'}`,
+            toggleFeature: () => this.toggleFeatureCollection(c.id, featured),
+            edit: () => this.openEditCollectionModal({ id:c.id, name, category, desc, featured }),
+            remove: () => this.deleteCollectionAdmin(c.id, name),
+          };
+        });
+      })(),
+      adminCollectionsCount: (() => {
+        const all = [...this.COLLECTIONS, ...s.adminCollectionsNew].filter(c => !s.adminCollectionDeleted.includes(c.id));
+        return all.length;
+      })(),
+      hasCollectionModal: !!s.adminCollectionModal,
+      collectionModalTitle: s.adminCollectionModal && s.adminCollectionModal.mode==='new' ? 'New collection' : 'Edit collection',
+      collectionModalSaveLabel: s.adminCollectionModal && s.adminCollectionModal.mode==='new' ? 'Create collection' : 'Save changes',
+      collectionModalName: s.adminCollectionModal ? s.adminCollectionModal.name : '',
+      collectionModalDesc: s.adminCollectionModal ? s.adminCollectionModal.desc : '',
+      collectionCategoryChips: ['Nature','Space','Abstract','Cars','Architecture'].map(cat => {
+        const on = s.adminCollectionModal && s.adminCollectionModal.category === cat;
+        return { label:cat, select:()=>this.setCollectionModalCategory(cat),
+          style:`padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid ${on?'transparent':'var(--line2)'};background:${on?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};color:${on?'#fff':'var(--muted)'}` };
+      }),
+      collectionModalFeaturedSwitchStyle: `width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.adminCollectionModal && s.adminCollectionModal.featured ?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.adminCollectionModal && s.adminCollectionModal.featured ?'transparent':'var(--line2)'};box-shadow:${s.adminCollectionModal && s.adminCollectionModal.featured ?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+      collectionModalFeaturedKnobStyle: s.adminCollectionModal && s.adminCollectionModal.featured ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      // ---- admin: community ----
+      isAdmComFeed: s.adminCommunityTab==='feed', isAdmComChallenges: s.adminCommunityTab==='challenges',
+      setAdmComFeed: ()=>this.setAdminCommunityTab('feed'), setAdmComChallenges: ()=>this.setAdminCommunityTab('challenges'),
+      admComFeedTabStyle: `display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;background:${s.adminCommunityTab==='feed'?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'transparent'};color:${s.adminCommunityTab==='feed'?'#fff':'var(--muted)'}`,
+      admComChallengesTabStyle: `padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;background:${s.adminCommunityTab==='challenges'?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'transparent'};color:${s.adminCommunityTab==='challenges'?'#fff':'var(--muted)'}`,
+      hasFlaggedPosts: (s.adminFeedFlagged||[]).length > 0,
+      flaggedCount: (s.adminFeedFlagged||[]).length,
+      adminFeedRows: s.communityFeed.filter(item => !(s.adminFeedRemoved||[]).includes(item.id)).map(item => {
+        const TYPE = { upload:{bg:'rgba(255,46,99,.13)',col:'#ff6a8a',lbl:'Uploaded'}, comment:{bg:'rgba(34,211,238,.12)',col:'#22d3ee',lbl:'Commented'}, milestone:{bg:'rgba(245,197,24,.13)',col:'#f5c518',lbl:'Achievement'} };
+        const t = TYPE[item.type]||TYPE.upload;
+        const flagged = (s.adminFeedFlagged||[]).includes(item.id);
+        const summary = item.type==='upload' ? `Uploaded "${item.title}" in ${item.category}` : item.type==='comment' ? `"${item.text}" on ${item.wallTitle}` : item.milestone;
+        return { ...item, avatar:this.avatar(item.av), typeIconBg:t.bg, typeIconCol:t.col, typeLabel:t.lbl, flagged, summary,
+          approve: ()=>this.approveFeedItem(item.id), remove: ()=>this.removeFeedItem(item.id) };
+      }),
+      openNewChallengeModal: this.openNewChallengeModal, closeChallengeModal: this.closeChallengeModal,
+      saveChallengeModal: this.saveChallengeModal,
+      setChallengeModalTitle: (e)=>this.setChallengeModalField('title', e),
+      setChallengeModalDesc: (e)=>this.setChallengeModalField('desc', e),
+      setChallengeModalPrize: (e)=>this.setChallengeModalField('prize', e),
+      setChallengeModalDeadline: (e)=>this.setChallengeModalField('deadline', e),
+      adminChallengeRows: s.communityChallenges.map(ch => ({ ...ch,
+        edit: ()=>this.openEditChallengeModal(ch), remove: ()=>this.deleteChallengeAdmin(ch.id, ch.title) })),
+      hasChallengeModal: !!s.adminChallengeModal,
+      challengeModalTitle: s.adminChallengeModal && s.adminChallengeModal.mode==='new' ? 'New challenge' : 'Edit challenge',
+      challengeModalSaveLabel: s.adminChallengeModal && s.adminChallengeModal.mode==='new' ? 'Create challenge' : 'Save changes',
+      challengeModalTitleVal: s.adminChallengeModal ? s.adminChallengeModal.title : '',
+      challengeModalDesc: s.adminChallengeModal ? s.adminChallengeModal.desc : '',
+      challengeModalPrize: s.adminChallengeModal ? s.adminChallengeModal.prize : '',
+      challengeModalDeadline: s.adminChallengeModal ? s.adminChallengeModal.deadline : '',
+      challengeColorChips: ['#ff2e63','#f5c518','#22d3ee','#8b5cf6','#30a46c'].map(color => {
+        const on = s.adminChallengeModal && s.adminChallengeModal.color === color;
+        return { color, select:()=>this.setChallengeModalColor(color),
+          style:`width:26px;height:26px;border-radius:50%;background:${color};cursor:pointer;border:2px solid ${on?'var(--text)':'transparent'};box-shadow:0 0 0 1px ${on?color:'transparent'}` };
+      }),
       goModeration: () => { window.scrollTo(0,0); this.setState({screen:'moderation'}); },
       get4K: activeRes[0].download,
       hasPending: pendingCount > 0, hasPendingNot: pendingCount === 0,
@@ -3462,8 +4544,8 @@ class Component extends DCLogic {
       languages: s.languages.map(l => ({ ...l, flag: ({en:'🇬🇧',es:'🇪🇸',fr:'🇫🇷',de:'🇩🇪',ja:'🇯🇵',zh:'🇨🇳',pt:'🇧🇷',ar:'🇸🇦',hi:'🇮🇳',ko:'🇰🇷',it:'🇮🇹',ru:'🇷🇺'})[l.code]||'🌐',
         toggle: () => this.toggleLanguage(l.code),
         setDefault: () => this.setDefaultLang(l.code),
-        toggleStyle:`width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s;background:${l.enabled?'#30a46c':'var(--track)'}`,
-        knobStyle:`position:absolute;top:2px;left:${l.enabled?'20px':'2px'};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s`,
+        toggleStyle:`width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${l.enabled?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${l.enabled?'transparent':'var(--line2)'};box-shadow:${l.enabled?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+        knobStyle:`position:absolute;top:3px;left:${l.enabled?'23px':'3px'};width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)`,
         defaultStyle:`font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;cursor:pointer;${l.isDefault?'background:rgba(255,46,99,.14);color:#ff2e63;border:1px solid rgba(255,46,99,.3)':'background:var(--surface2);color:var(--muted);border:1px solid var(--line)'}`,
         pctBarStyle:`width:${l.pct}%;height:5px;border-radius:999px;background:${l.enabled?'linear-gradient(90deg,#ff2e63,#ff6a3d)':'var(--track)'}`,
       })),

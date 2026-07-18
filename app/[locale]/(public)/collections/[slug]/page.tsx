@@ -8,6 +8,8 @@ import { WallpaperGrid } from "@/components/wallpaper-card";
 import { collectionThumbSrc } from "@/lib/collection-ui";
 import { formatCount } from "@/lib/format";
 import { CollectionSaveButton } from "@/components/collections/collection-save-button";
+import { RichContent } from "@/components/rich-content";
+import { stripHtml } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +23,9 @@ export async function generateMetadata({
   if (!data) return { title: "Not Found" };
   return buildMetadata({
     title: `${data.collection.name} — Collection`,
-    description: data.collection.description ?? undefined,
+    description:
+      stripHtml(data.collection.description) ||
+      `${data.collection.name} — a curated wallpaper collection.`,
     path: `/collections/${slug}`,
     locale: locale as "en",
   });
@@ -68,7 +72,7 @@ export default async function CollectionDetailPage({
             {collection.name}
           </h1>
           {collection.description && (
-            <p className="text-[15px] max-w-2xl leading-relaxed" style={{ color: "var(--text3)" }}>{collection.description}</p>
+            <RichContent html={collection.description} className="rte-prose rte-prose-sm max-w-2xl" />
           )}
           <div className="flex flex-wrap items-center gap-4 mt-4 text-sm" style={{ color: "var(--dim)" }}>
             <Link href={`${prefix}/u/${curatorUsername}`} className="inline-flex items-center gap-2 no-underline font-semibold" style={{ color: "var(--text2)" }}>

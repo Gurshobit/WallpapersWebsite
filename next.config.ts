@@ -17,6 +17,10 @@ function cdnHostname(): string | null {
 const cdnHost = cdnHostname();
 
 const nextConfig: NextConfig = {
+  // isomorphic-dompurify pulls in jsdom, which loads data files (e.g.
+  // default-stylesheet.css) at runtime. Keep it external so Next resolves it
+  // from node_modules instead of bundling (which breaks those file lookups).
+  serverExternalPackages: ["isomorphic-dompurify", "jsdom"],
   images: {
     remotePatterns: [
       // Presigned R2 direct URLs (used for secure downloads)

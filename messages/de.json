@@ -156,7 +156,10 @@
     "newPassword": "Neues Passwort",
     "confirmPassword": "Neues Passwort bestätigen",
     "minPassword": "Mindestens 8 Zeichen",
-    "changePasswordBtn": "Passwort ändern"
+    "changePasswordBtn": "Passwort ändern",
+    "saved": "Settings saved",
+    "currentEmail": "Current email",
+    "passwordMismatch": "Passwords do not match"
   },
   "upload": {
     "pageTitle": "Hintergrundbild hochladen",

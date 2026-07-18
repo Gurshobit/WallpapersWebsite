@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
+import { SiteLogo } from "./site-logo";
 import { requestPasswordReset } from "@/lib/auth-client";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { getTurnstileSiteKey, isTurnstileEnabled } from "@/lib/turnstile";
@@ -45,7 +45,7 @@ export function ForgotPasswordForm() {
     <div className="min-h-screen flex items-center justify-center px-5 py-10 relative">
       <div className="w-full max-w-[440px] relative">
         <Link href={prefix || "/"} className="flex justify-center mb-[30px]">
-          <Image src="/assets/logo.png" alt="HD Wallpapers" width={176} height={44} className="site-logo h-11 w-auto" priority />
+          <SiteLogo height={44} className="h-11 w-auto" priority />
         </Link>
 
         <div className="rounded-[20px] p-8" style={{ background: "var(--surface)", border: "1px solid var(--line)", boxShadow: "0 24px 64px rgba(0,0,0,.28)" }}>

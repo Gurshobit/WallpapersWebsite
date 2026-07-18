@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { SiteLogo } from "../site-logo";
 import { AdminNavIcon, IconArrowLeft, type AdminNavIconKey } from "./admin-icons";
 import { AdminAppearanceToggle } from "./admin-appearance-toggle";
 import { PLATFORM_VERSION } from "@/lib/version";
@@ -18,6 +18,8 @@ const NAV: {
   { href: "/admin", label: "Dashboard", icon: "dashboard", color: "#ff6a8a", bg: "rgba(255,46,99,.13)" },
   { href: "/admin/moderation", label: "Moderation", icon: "moderation", badgeKey: "pending", color: "#f5c518", bg: "rgba(245,197,24,.13)" },
   { href: "/admin/wallpapers", label: "Wallpapers", icon: "wallpapers", color: "#7fe6f5", bg: "rgba(34,211,238,.12)" },
+  { href: "/admin/collections", label: "Collections", icon: "collections", color: "#c4b5fd", bg: "rgba(139,92,246,.13)" },
+  { href: "/admin/community", label: "Community", icon: "community", color: "#67e8f9", bg: "rgba(34,211,238,.12)" },
   { href: "/admin/users", label: "Users", icon: "users", color: "#b794f6", bg: "rgba(139,92,246,.13)" },
   { href: "/admin/member-settings", label: "Member Settings", icon: "members", color: "#22d3ee", bg: "rgba(34,211,238,.1)" },
   { href: "/admin/categories", label: "Categories", icon: "categories", color: "#6ee7a0", bg: "rgba(48,164,108,.12)" },
@@ -27,6 +29,7 @@ const NAV: {
   { href: "/admin/licenses", label: "Licenses", icon: "licenses", color: "#fbbf24", bg: "rgba(251,191,36,.1)" },
   { href: "/admin/pages", label: "Pages", icon: "pages", color: "#86efac", bg: "rgba(134,239,172,.1)" },
   { href: "/admin/ads", label: "Ads", icon: "ads", color: "#fb923c", bg: "rgba(251,146,60,.1)" },
+  { href: "/admin/languages", label: "Languages", icon: "languages", color: "#93c5fd", bg: "rgba(59,130,246,.12)" },
   { href: "/admin/settings", label: "Settings", icon: "settings", color: "#cbd5e1", bg: "rgba(148,163,184,.13)" },
 ];
 
@@ -44,14 +47,7 @@ export function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
     >
       <div className="flex items-center gap-2.5 px-2 pb-5">
         <div className="flex flex-col gap-0.5">
-          <Image
-            src="/assets/logo.png"
-            alt="HD Wallpapers"
-            width={120}
-            height={28}
-            className="site-logo h-7 w-auto"
-            priority
-          />
+          <SiteLogo height={28} className="h-7 w-auto" priority />
           <div className="text-[10px] tracking-[0.3px]" style={{ color: "var(--dim2)" }}>
             Admin panel · v{PLATFORM_VERSION}
           </div>

@@ -52,7 +52,7 @@ export async function sendContactEmail(opts: {
     <p><strong>Date:</strong> ${escapeHtml(date)}</p>
     ${ip ? `<p><strong>IP:</strong> ${escapeHtml(ip)}</p>` : ""}
     <hr />
-    <p>${escapeHtml(message).replace(/\n/g, "<br />")}</p>
+    <div>${message}</div>
   `;
 
   if (process.env.RESEND_API_KEY) {

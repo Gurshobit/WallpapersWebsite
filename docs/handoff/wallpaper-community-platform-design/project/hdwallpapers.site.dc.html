@@ -28,8 +28,11 @@
   html,body{transition:background-color .25s ease,color .25s ease}
   .hd-sort-tab .hd-sort-lbl{max-width:0;overflow:hidden;opacity:0;transition:max-width .2s ease,opacity .15s ease;white-space:nowrap;display:inline-block;vertical-align:middle}
   .hd-sort-tab:hover .hd-sort-lbl,.hd-sort-active .hd-sort-lbl{max-width:120px;opacity:1}
-  img.site-logo{transition:filter .25s ease}
-  :root[data-theme="light"] img.site-logo{filter:brightness(.92) drop-shadow(0 1px 2px rgba(0,0,0,.12))}
+  img.site-logo-dark{display:none}
+  :root[data-theme="light"] img.site-logo-light{display:block}
+  :root[data-theme="light"] img.site-logo-dark{display:none}
+  :root:not([data-theme="light"]) img.site-logo-light{display:none}
+  :root:not([data-theme="light"]) img.site-logo-dark{display:block}
 
   /* ---- RESPONSIVE ---- */
   @media(max-width:1024px){
@@ -82,7 +85,7 @@
 <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
 <header class="hd-header" style="position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:24px;padding:14px 28px;background:var(--glass);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)">
   <div onClick="{{ goHome }}" style="display:flex;align-items:center;cursor:pointer;flex:none">
-    <img src="./assets/logo.png" alt="HD Wallpapers" class="site-logo" style="height:38px;width:auto;display:block"/>
+    <img src="./assets/logo-light.png" alt="HD Wallpapers" class="site-logo site-logo-light" style="height:38px;width:auto"/><img src="./assets/logo-dark.png" alt="HD Wallpapers" class="site-logo site-logo-dark" style="height:38px;width:auto"/>
   </div>
   <nav class="hd-header-nav" style="display:flex;align-items:center;gap:4px;flex:none">
     <span onClick="{{ goHome }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:14px;font-weight:600;color:var(--text);background:var(--line);cursor:pointer">
@@ -482,7 +485,7 @@
     <div style="max-width:1320px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px">
       <div style="max-width:300px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-          <img src="./assets/logo.png" alt="HD Wallpapers" class="site-logo" style="height:30px;width:auto;display:block"/>
+          <img src="./assets/logo-light.png" alt="HD Wallpapers" class="site-logo site-logo-light" style="height:30px;width:auto"/><img src="./assets/logo-dark.png" alt="HD Wallpapers" class="site-logo site-logo-dark" style="height:30px;width:auto"/>
         </div>
         <p style="font-size:13px;color:var(--dim);line-height:1.6">{{ i18n.footer_tagline }}</p>
       </div>
@@ -1247,7 +1250,7 @@
   <aside style="width:236px;flex:none;background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:18px 14px">
     <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 20px">
       <div style="display:flex;flex-direction:column;gap:2px">
-        <img src="./assets/logo.png" alt="HD Wallpapers" class="site-logo" style="height:28px;width:auto;display:block"/>
+        <img src="./assets/logo-light.png" alt="HD Wallpapers" class="site-logo site-logo-light" style="height:28px;width:auto"/><img src="./assets/logo-dark.png" alt="HD Wallpapers" class="site-logo site-logo-dark" style="height:28px;width:auto"/>
         <div style="font-size:10px;color:var(--dim2);letter-spacing:.3px">Admin panel</div>
       </div>
     </div>
@@ -2069,7 +2072,7 @@
             <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Featured wallpapers</label><input value="{{ wallDefaults.featuredCount }}" onInput="{{ setWDFeatured }}" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:9px;padding:10px 12px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
             <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px 14px">
               <div><div style="font-size:13.5px;font-weight:600">Show pagination on latest</div></div>
-              <div onClick="{{ toggleWDPagination }}" style="{{ wdPaginationStyle }}"><div style="{{ wallDefaults.showPagination ? knobOnStyle : knobOffStyle }}"></div></div>
+              <div onClick="{{ toggleWDPagination }}" style="{{ wdPaginationStyle }}"><div style="{{ wdPaginationKnobStyle }}"></div></div>
             </div>
           </div>
           <button style="margin-top:16px;background:var(--surface2);border:1px solid var(--line2);color:var(--text);border-radius:9px;padding:10px 18px;font-family:'Manrope';font-weight:700;font-size:13.5px;cursor:pointer">Update settings</button>
@@ -2169,6 +2172,199 @@
             <div style="display:flex;justify-content:center;color:var(--dim2);cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg></div>
           </div>
         </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- COLLECTIONS (admin table) -->
+    <sc-if value="{{ isAdmCollections }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:26px 30px 50px;animation:fadeUp .35s ease both">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:26px;letter-spacing:-.5px">Collections</h1>
+          <div style="font-size:13px;color:var(--dim);margin-top:3px">{{ adminCollectionsCount }} total · curated &amp; user-submitted</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="position:relative">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="position:absolute;left:12px;top:50%;transform:translateY(-50%)"><circle cx="11" cy="11" r="7" stroke="var(--dim2)" stroke-width="2"/><path d="m20 20-3-3" stroke="var(--dim2)" stroke-width="2" stroke-linecap="round"/></svg>
+            <input value="{{ adminCollectionsSearch }}" onInput="{{ setAdminCollectionsSearch }}" placeholder="Search collections…" style="width:220px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px 9px 34px;color:var(--text);font-family:'Manrope';font-size:13.5px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/>
+          </div>
+          <button onClick="{{ openNewCollectionModal }}" style="display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-family:'Manrope';font-weight:700;font-size:13.5px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>New collection
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:3px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:4px;margin-bottom:14px;width:fit-content">
+        <sc-for list="{{ adminCollectionsFilterTabs }}" as="f" hint-placeholder-count="4">
+          <span onClick="{{ f.select }}" style="{{ f.style }}">{{ f.label }}</span>
+        </sc-for>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:15px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:56px 1.8fr 1fr 1fr .7fr .8fr 110px 130px;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--dim2);align-items:center">
+          <span></span><span>Name</span><span>Category</span><span>Curator</span><span>Walls</span><span>Saves</span><span>Status</span><span>Actions</span>
+        </div>
+        <sc-for list="{{ adminCollectionsRows }}" as="c" hint-placeholder-count="8">
+          <div style="display:grid;grid-template-columns:56px 1.8fr 1fr 1fr .7fr .8fr 110px 130px;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:center" style-hover="background:var(--surface2)">
+            <div style="width:56px;height:34px;border-radius:7px;background:var(--surface2) url({{ c.thumb }}) center/cover;flex:none"></div>
+            <div style="min-width:0">
+              <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</div>
+              <div style="font-size:11.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.desc }}</div>
+            </div>
+            <div><span style="{{ c.catStyle }}">{{ c.category }}</span></div>
+            <div style="display:flex;align-items:center;gap:7px;min-width:0">
+              <span style="width:22px;height:22px;border-radius:50%;background:var(--surface2) url({{ c.curatorAvatar }}) center/cover;flex:none"></span>
+              <span style="font-size:12.5px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.curator }}</span>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:var(--text3)">{{ c.count }}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text3)">{{ c.savesF }}</div>
+            <div><span style="{{ c.statusStyle }}">{{ c.statusLabel }}</span></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div onClick="{{ c.toggleFeature }}" title="Feature" style="{{ c.featureBtnStyle }}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="{{ c.featured ? 'currentColor' : 'none' }}"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 0 0 .95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 0 0-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 0 0-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 0 0-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 0 0 .951-.69l1.519-4.674z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              </div>
+              <div onClick="{{ c.edit }}" title="Edit" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--dim2);border:1px solid var(--line)" style-hover="background:var(--surface3);color:var(--text)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div onClick="{{ c.remove }}" title="Delete" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#ff8a8d" style-hover="background:rgba(229,72,77,.12)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- COMMUNITY (admin) -->
+    <sc-if value="{{ isAdmCommunity }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:26px 30px 50px;animation:fadeUp .35s ease both">
+      <div style="margin-bottom:18px">
+        <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:26px;letter-spacing:-.5px">Community</h1>
+        <div style="font-size:13px;color:var(--dim);margin-top:3px">Moderate the activity feed and manage challenges</div>
+      </div>
+
+      <div style="display:flex;gap:3px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:4px;margin-bottom:20px;width:fit-content">
+        <button onClick="{{ setAdmComFeed }}" style="{{ admComFeedTabStyle }}">
+          Feed Moderation
+          <sc-if value="{{ hasFlaggedPosts }}" hint-placeholder-val="{{ false }}">
+            <span style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:#ff2e63;color:#fff;border-radius:999px;font-size:10.5px;font-weight:700">{{ flaggedCount }}</span>
+          </sc-if>
+        </button>
+        <button onClick="{{ setAdmComChallenges }}" style="{{ admComChallengesTabStyle }}">Challenges</button>
+      </div>
+
+      <sc-if value="{{ isAdmComFeed }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ adminFeedRows }}" as="fi" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px" style-hover="border-color:var(--line2)">
+            <div style="width:38px;height:38px;border-radius:50%;background:var(--surface2) url({{ fi.avatar }}) center/cover;flex:none"></div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span style="font-size:13.5px;font-weight:700">{{ fi.user }}</span>
+                <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:{{ fi.typeIconBg }};color:{{ fi.typeIconCol }}">{{ fi.typeLabel }}</span>
+                <sc-if value="{{ fi.flagged }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:11px;font-weight:700;color:#ff8a8d;background:rgba(229,72,77,.12);border:1px solid rgba(229,72,77,.3);padding:2px 8px;border-radius:999px">Flagged</span>
+                </sc-if>
+              </div>
+              <div style="font-size:12.5px;color:var(--dim3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fi.summary }}</div>
+            </div>
+            <div style="font-size:12px;color:var(--dim);flex:none">{{ fi.ts }}</div>
+            <div style="display:flex;gap:6px;flex:none">
+              <sc-if value="{{ fi.flagged }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ fi.approve }}" style="background:rgba(48,164,108,.15);border:1px solid rgba(48,164,108,.4);color:#5fd398;border-radius:8px;padding:7px 12px;font-family:'Manrope';font-weight:700;font-size:12.5px;cursor:pointer">Approve</button>
+              </sc-if>
+              <button onClick="{{ fi.remove }}" style="background:rgba(229,72,77,.12);border:1px solid rgba(229,72,77,.35);color:#ff8a8d;border-radius:8px;padding:7px 12px;font-family:'Manrope';font-weight:700;font-size:12.5px;cursor:pointer">Remove</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isAdmComChallenges }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+          <button onClick="{{ openNewChallengeModal }}" style="display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-family:'Manrope';font-weight:700;font-size:13.5px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>New challenge
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ adminChallengeRows }}" as="ch" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px" style-hover="border-color:var(--line2)">
+              <div style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ ch.color }}"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:14.5px;font-weight:700">{{ ch.title }}</div>
+                <div style="font-size:12px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ch.desc }}</div>
+              </div>
+              <div style="text-align:center;flex:none"><div style="font-family:'Space Grotesk';font-weight:700;font-size:15px">{{ ch.entries }}</div><div style="font-size:10.5px;color:var(--dim)">Entries</div></div>
+              <div style="font-size:12.5px;color:var(--dim);flex:none;min-width:110px">Ends {{ ch.deadline }}</div>
+              <div style="display:flex;gap:6px;flex:none">
+                <div onClick="{{ ch.edit }}" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--dim2);border:1px solid var(--line)" style-hover="background:var(--surface3);color:var(--text)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div onClick="{{ ch.remove }}" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#ff8a8d" style-hover="background:rgba(229,72,77,.12)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- collection create/edit modal -->
+    <sc-if value="{{ hasCollectionModal }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:20px;width:100%;max-width:460px;padding:26px;animation:fadeUp .2s ease both">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+          <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:19px">{{ collectionModalTitle }}</h3>
+          <span onClick="{{ closeCollectionModal }}" style="cursor:pointer;color:var(--dim2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Name</label><input value="{{ collectionModalName }}" onInput="{{ setCollectionModalName }}" placeholder="Collection name" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Category</label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <sc-for list="{{ collectionCategoryChips }}" as="opt" hint-placeholder-count="5">
+                <span onClick="{{ opt.select }}" style="{{ opt.style }}">{{ opt.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Description</label><textarea value="{{ collectionModalDesc }}" onInput="{{ setCollectionModalDesc }}" rows="3" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none;resize:vertical" style-focus="border-color:rgba(255,46,99,.5)">{{ collectionModalDesc }}</textarea></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:2px">
+            <div style="font-size:13.5px;font-weight:600">Feature on homepage</div>
+            <div onClick="{{ toggleCollectionModalFeatured }}" style="{{ collectionModalFeaturedSwitchStyle }}"><div style="{{ collectionModalFeaturedKnobStyle }}"></div></div>
+          </div>
+          <button onClick="{{ saveCollectionModal }}" style="margin-top:4px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:12px 20px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">{{ collectionModalSaveLabel }}</button>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- challenge create/edit modal -->
+    <sc-if value="{{ hasChallengeModal }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:20px;width:100%;max-width:460px;padding:26px;animation:fadeUp .2s ease both">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+          <h3 style="font-family:'Space Grotesk';font-weight:700;font-size:19px">{{ challengeModalTitle }}</h3>
+          <span onClick="{{ closeChallengeModal }}" style="cursor:pointer;color:var(--dim2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Title</label><input value="{{ challengeModalTitleVal }}" onInput="{{ setChallengeModalTitle }}" placeholder="Challenge title" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Accent color</label>
+            <div style="display:flex;gap:8px">
+              <sc-for list="{{ challengeColorChips }}" as="cc" hint-placeholder-count="5">
+                <span onClick="{{ cc.select }}" style="{{ cc.style }}"></span>
+              </sc-for>
+            </div>
+          </div>
+          <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Description</label><textarea value="{{ challengeModalDesc }}" onInput="{{ setChallengeModalDesc }}" rows="3" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none;resize:vertical" style-focus="border-color:rgba(255,46,99,.5)">{{ challengeModalDesc }}</textarea></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Prize</label><input value="{{ challengeModalPrize }}" onInput="{{ setChallengeModalPrize }}" placeholder="Creator badge…" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
+            <div><label style="display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px">Deadline</label><input value="{{ challengeModalDeadline }}" onInput="{{ setChallengeModalDeadline }}" placeholder="Jul 31, 2026" style="width:100%;background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Manrope';font-size:14px;outline:none" style-focus="border-color:rgba(255,46,99,.5)"/></div>
+          </div>
+          <button onClick="{{ saveChallengeModal }}" style="margin-top:4px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:12px 20px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">{{ challengeModalSaveLabel }}</button>
+        </div>
       </div>
     </div>
     </sc-if>
@@ -2540,15 +2736,15 @@
     <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line)">
         <div><div style="font-size:14px;font-weight:600">Show wallpaper author on my uploads</div><div style="font-size:12px;color:var(--dim);margin-top:2px">Your name appears on wallpaper detail pages</div></div>
-        <div onClick="{{ toggleShowAuthor }}" style="{{ showAuthorStyle }}"><div style="{{ userPrivacy.showAuthor ? knobOnStyle : knobOffStyle }}"></div></div>
+        <div onClick="{{ toggleShowAuthor }}" style="{{ showAuthorStyle }}"><div style="{{ showAuthorKnobStyle }}"></div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my profile</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my contact info</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my biography</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my downloads</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my favourites</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
-        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my wallpapers</div><select style="width:100%;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Manrope';font-size:13px;outline:none"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my profile</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my contact info</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my biography</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my downloads</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my favourites</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
+        <div style="background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:600;margin-bottom:8px">View my wallpapers</div><select style="appearance:none;-webkit-appearance:none;width:100%;background-color:var(--surface);background-image:url('data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22&gt;&lt;path d=%22m6 9 6 6 6-6%22 stroke=%22%239a9aa3%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/&gt;&lt;/svg&gt;');background-repeat:no-repeat;background-position:right 12px center;border:1px solid var(--line2);border-radius:9px;padding:9px 34px 9px 12px;color:var(--text);font-family:'Manrope';font-size:13px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s" style-hover="border-color:var(--line3)" style-focus="border-color:rgba(255,46,99,.5)"><option>Everyone</option><option>Followers</option><option>Only me</option></select></div>
       </div>
       <button style="align-self:flex-start;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:12px 24px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">Update privacy</button>
     </div>
@@ -2559,15 +2755,15 @@
     <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:0">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--line)">
         <div><div style="font-size:14px;font-weight:600">Someone comments on my wallpapers</div><div style="font-size:12px;color:var(--dim);margin-top:2px">Get an email when a new comment is posted</div></div>
-        <div onClick="{{ toggleCommentNotif }}" style="{{ commentNotifStyle }}"><div style="{{ userNotif.commentNotif ? knobOnStyle : knobOffStyle }}"></div></div>
+        <div onClick="{{ toggleCommentNotif }}" style="{{ commentNotifStyle }}"><div style="{{ commentNotifKnobStyle }}"></div></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--line)">
         <div><div style="font-size:14px;font-weight:600">My wallpaper status changes</div><div style="font-size:12px;color:var(--dim);margin-top:2px">Approved, rejected, or disabled by admin</div></div>
-        <div onClick="{{ toggleStatusNotif }}" style="{{ statusNotifStyle }}"><div style="{{ userNotif.statusNotif ? knobOnStyle : knobOffStyle }}"></div></div>
+        <div onClick="{{ toggleStatusNotif }}" style="{{ statusNotifStyle }}"><div style="{{ statusNotifKnobStyle }}"></div></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0">
         <div><div style="font-size:14px;font-weight:600">New follower</div><div style="font-size:12px;color:var(--dim);margin-top:2px">When someone follows your creator profile</div></div>
-        <div style="width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:var(--track)"><div style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff"></div></div>
+        <div style="width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:var(--surface2);border:1px solid var(--line2)"><div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)"></div></div>
       </div>
       <button style="align-self:flex-start;margin-top:8px;background:linear-gradient(135deg,#ff2e63,#ff6a3d);color:#fff;border:none;border-radius:11px;padding:12px 24px;font-family:'Manrope';font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(255,46,99,.28)">Update notifications</button>
     </div>
@@ -2604,7 +2800,7 @@
   <div style="width:100%;max-width:440px;position:relative">
     <!-- logo -->
     <div onClick="{{ goHome }}" style="display:flex;align-items:center;justify-content:center;margin-bottom:30px;cursor:pointer">
-      <img src="./assets/logo.png" alt="HD Wallpapers" class="site-logo" style="height:44px;width:auto;display:block"/>
+      <img src="./assets/logo-light.png" alt="HD Wallpapers" class="site-logo site-logo-light" style="height:44px;width:auto"/><img src="./assets/logo-dark.png" alt="HD Wallpapers" class="site-logo site-logo-dark" style="height:44px;width:auto"/>
     </div>
 
     <!-- card -->
@@ -2816,6 +3012,14 @@ class Component extends DCLogic {
     collectionsSort: 'saves',
     collectionsSearch: '',
     savedCollections: [2, 8],
+    // admin: collections
+    adminCollectionsSearch: '', adminCollectionsFilter: 'All',
+    adminCollectionFeaturedOverride: {}, adminCollectionStatusOverride: { 4:'pending', 11:'pending' },
+    adminCollectionEdits: {}, adminCollectionDeleted: [], adminCollectionsNew: [],
+    adminCollectionModal: null,
+    // admin: community
+    adminCommunityTab: 'feed', adminFeedFlagged: [2, 5], adminFeedRemoved: [],
+    adminChallengeModal: null,
     communityTab: 'feed',
     communityFeed: [
       { id:1, type:'upload',    user:'Kai Tanaka',   av:11, handle:'kai.t',      title:'Nebula Cascade',   category:'Space',    ts:'2 hours ago',  likes:347,  downloads:1420, verified:true },
@@ -3476,10 +3680,63 @@ class Component extends DCLogic {
     this.flash(action === 'approve' ? 'Wallpaper approved & published' : 'Submission rejected');
   }
 
+  // admin: collections
+  setAdminCollectionsSearch = (e) => this.setState({ adminCollectionsSearch: e.target.value });
+  setAdminCollectionsFilter = (f) => this.setState({ adminCollectionsFilter: f });
+  toggleFeatureCollection = (id, current) => { this.setState(s => ({ adminCollectionFeaturedOverride: { ...s.adminCollectionFeaturedOverride, [id]: !current } })); this.flash(!current ? 'Collection featured' : 'Collection unfeatured'); };
+  deleteCollectionAdmin = (id, name) => { this.setState(s => ({ adminCollectionDeleted: [...s.adminCollectionDeleted, id] })); this.flash(`Collection "${name}" deleted`); };
+  openNewCollectionModal = () => this.setState({ adminCollectionModal: { mode:'new', id:null, name:'', category:'Nature', desc:'', featured:false } });
+  openEditCollectionModal = (col) => this.setState({ adminCollectionModal: { mode:'edit', id:col.id, name:col.name, category:col.category, desc:col.desc, featured:col.featured } });
+  closeCollectionModal = () => this.setState({ adminCollectionModal: null });
+  setCollectionModalName = (e) => this.setState(s => ({ adminCollectionModal: { ...s.adminCollectionModal, name: e.target.value } }));
+  setCollectionModalDesc = (e) => this.setState(s => ({ adminCollectionModal: { ...s.adminCollectionModal, desc: e.target.value } }));
+  setCollectionModalCategory = (cat) => this.setState(s => ({ adminCollectionModal: { ...s.adminCollectionModal, category: cat } }));
+  toggleCollectionModalFeatured = () => this.setState(s => ({ adminCollectionModal: { ...s.adminCollectionModal, featured: !s.adminCollectionModal.featured } }));
+  saveCollectionModal = () => {
+    const m = this.state.adminCollectionModal;
+    if (!m) return;
+    if (!m.name || !m.name.trim()) { this.flash('Enter a collection name'); return; }
+    if (m.mode === 'new') {
+      const id = 2000 + Math.floor(Math.random()*9000);
+      this.setState(s => ({ adminCollectionsNew: [...s.adminCollectionsNew, { id, name:m.name.trim(), curator:'admin', curatorAv:1, count:0, saves:0, views:0, category:m.category, featured:m.featured, desc:m.desc||'' }], adminCollectionModal:null }));
+      this.flash(`Collection "${m.name.trim()}" created`);
+    } else {
+      this.setState(s => ({
+        adminCollectionFeaturedOverride: { ...s.adminCollectionFeaturedOverride, [m.id]: m.featured },
+        adminCollectionEdits: { ...s.adminCollectionEdits, [m.id]: { name:m.name.trim(), category:m.category, desc:m.desc } },
+        adminCollectionModal: null,
+      }));
+      this.flash('Collection updated');
+    }
+  };
+
+  // admin: community
+  setAdminCommunityTab = (t) => this.setState({ adminCommunityTab: t });
+  approveFeedItem = (id) => { this.setState(s => ({ adminFeedFlagged: (s.adminFeedFlagged||[]).filter(x => x !== id) })); this.flash('Post approved'); };
+  removeFeedItem = (id) => { this.setState(s => ({ adminFeedRemoved: [...s.adminFeedRemoved, id] })); this.flash('Post removed'); };
+  openNewChallengeModal = () => this.setState({ adminChallengeModal: { mode:'new', id:null, title:'', color:'#ff2e63', desc:'', prize:'', deadline:'' } });
+  openEditChallengeModal = (ch) => this.setState({ adminChallengeModal: { mode:'edit', id:ch.id, title:ch.title, color:ch.color, desc:ch.desc, prize:ch.prize, deadline:ch.deadline } });
+  closeChallengeModal = () => this.setState({ adminChallengeModal: null });
+  setChallengeModalField = (field, e) => this.setState(s => ({ adminChallengeModal: { ...s.adminChallengeModal, [field]: e.target.value } }));
+  setChallengeModalColor = (color) => this.setState(s => ({ adminChallengeModal: { ...s.adminChallengeModal, color } }));
+  saveChallengeModal = () => {
+    const m = this.state.adminChallengeModal;
+    if (!m) return;
+    if (!m.title || !m.title.trim()) { this.flash('Enter a challenge title'); return; }
+    if (m.mode === 'new') {
+      this.setState(s => ({ communityChallenges: [...s.communityChallenges, { id: Date.now(), title:m.title.trim(), color:m.color, desc:m.desc||'', prize:m.prize||'', entries:0, deadline:m.deadline||'TBD' }], adminChallengeModal:null }));
+      this.flash(`Challenge "${m.title.trim()}" created`);
+    } else {
+      this.setState(s => ({ communityChallenges: s.communityChallenges.map(c => c.id===m.id ? { ...c, title:m.title.trim(), color:m.color, desc:m.desc, prize:m.prize, deadline:m.deadline } : c), adminChallengeModal:null }));
+      this.flash('Challenge updated');
+    }
+  };
+  deleteChallengeAdmin = (id, title) => { this.setState(s => ({ communityChallenges: s.communityChallenges.filter(c => c.id !== id) })); this.flash(`Challenge "${title}" deleted`); };
+
   renderVals() {
     const s = this.state;
     const screen = s.screen;
-    const ADMIN_SCREENS = ['admin','moderation','adminwall','users','categories','analytics','settings','admembers','admwallsettings'];
+    const ADMIN_SCREENS = ['admin','moderation','adminwall','admcollections','admcommunity','users','categories','analytics','settings','admembers','admwallsettings'];
     const isAdminArea = ADMIN_SCREENS.includes(screen);
     const hideHeader = isAdminArea || screen === 'auth';
     const raw = this.filteredRaw();
@@ -3622,6 +3879,8 @@ class Component extends DCLogic {
       {k:'dashboard', label:'Dashboard', scr:'admin', icon:'dashboard'},
       {k:'moderation', label:'Moderation', scr:'moderation', badge:pendingCount, icon:'moderation'},
       {k:'wallpapers', label:'Wallpapers', scr:'adminwall', icon:'wallpapers'},
+      {k:'admcollections', label:'Collections', scr:'admcollections', icon:'collections'},
+      {k:'admcommunity', label:'Community', scr:'admcommunity', icon:'community'},
       {k:'users', label:'Users', scr:'users', icon:'users'},
       {k:'admembers', label:'Member Settings', scr:'admembers', icon:'members'},
       {k:'categories', label:'Categories', scr:'categories', icon:'categories'},
@@ -3668,8 +3927,8 @@ class Component extends DCLogic {
     const resList = s.resPresets.map((r,i) => { const c = RES_COLORS[i % RES_COLORS.length];
       return { ...r, dims:`${r.w} × ${r.h}`, size:this.resSize(r.w, r.h),
         badgeStyle:`background:${c}22;color:${c};border:1px solid ${c}66;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:700;white-space:nowrap`,
-        trackStyle:`width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s;background:${r.enabled?'#30a46c':'var(--track)'};flex:none`,
-        knobStyle:`position:absolute;top:2px;left:${r.enabled?'20px':'2px'};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)`,
+        trackStyle:`width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${r.enabled?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${r.enabled?'transparent':'var(--line2)'};box-shadow:${r.enabled?'0 0 0 3px rgba(255,46,99,.15)':'none'};flex:none`,
+        knobStyle:`position:absolute;top:3px;left:${r.enabled?'23px':'3px'};width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)`,
         toggle:()=>this.toggleRes(r.id), del:()=>this.deleteRes(r.id) }; });
     const enabledResCount = s.resPresets.filter(r => r.enabled).length;
 
@@ -3791,6 +4050,7 @@ class Component extends DCLogic {
       isUsers: screen === 'users', isCategories: screen === 'categories',
       isAnalytics: screen === 'analytics', isSettings: screen === 'settings',
       isAdminWall: screen === 'adminwall',
+      isAdmCollections: screen === 'admcollections', isAdmCommunity: screen === 'admcommunity',
       isAdmembers: screen === 'admembers', isAdmWallSettings: screen === 'admwallsettings',
       // user settings
       isUserSettings: screen === 'usersettings',
@@ -3810,11 +4070,15 @@ class Component extends DCLogic {
       toggleShowAuthor: ()=>this.setPrivacy('showAuthor',!s.userPrivacy.showAuthor),
       toggleCommentNotif: ()=>this.setNotif('commentNotif',!s.userNotif.commentNotif),
       toggleStatusNotif: ()=>this.setNotif('statusNotif',!s.userNotif.statusNotif),
-      showAuthorStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.userPrivacy.showAuthor?'#30a46c':'var(--track)'}`,
-      commentNotifStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.userNotif.commentNotif?'#30a46c':'var(--track)'}`,
-      statusNotifStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.userNotif.statusNotif?'#30a46c':'var(--track)'}`,
-      knobOnStyle: 'position:absolute;top:2px;left:20px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s',
-      knobOffStyle: 'position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s',
+      showAuthorStyle: `flex:none;width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.userPrivacy.showAuthor?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.userPrivacy.showAuthor?'transparent':'var(--line2)'};box-shadow:${s.userPrivacy.showAuthor?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+      commentNotifStyle: `flex:none;width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.userNotif.commentNotif?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.userNotif.commentNotif?'transparent':'var(--line2)'};box-shadow:${s.userNotif.commentNotif?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+      statusNotifStyle: `flex:none;width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.userNotif.statusNotif?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.userNotif.statusNotif?'transparent':'var(--line2)'};box-shadow:${s.userNotif.statusNotif?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+      knobOnStyle: 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      knobOffStyle: 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      wdPaginationKnobStyle: s.wallDefaults.showPagination ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      showAuthorKnobStyle: s.userPrivacy.showAuthor ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      commentNotifKnobStyle: s.userNotif.commentNotif ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      statusNotifKnobStyle: s.userNotif.statusNotif ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
       // admin settings sub-nav
       adminSettingsSection: s.adminSettingsSection,
       setAdminSection: (sec)=>()=>this.setAdminSettingsSection(sec),
@@ -3863,16 +4127,16 @@ class Component extends DCLogic {
       setAMPass: (e)=>this.setAddMemberForm('password',e), setAMStatus: (e)=>this.setAddMemberForm('status',e),
       setAMRole: (e)=>this.setAddMemberForm('role',e),
       toggleMS: (k)=>()=>this.setMemberSetting(k,!s.memberSettings[k]),
-      canRegisterStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canRegister?'#30a46c':'var(--track)'};transition:background .18s ease`,
-      reqConfStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.requireConfirmation?'#30a46c':'var(--track)'};transition:background .18s ease`,
-      canSubmitStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canSubmit?'#30a46c':'var(--track)'};transition:background .18s ease`,
-      canCommentStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canComment?'#30a46c':'var(--track)'};transition:background .18s ease`,
-      modCommentStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.moderateComments?'#30a46c':'var(--track)'};transition:background .18s ease`,
-      canRegisterKnob: `position:absolute;top:4px;left:${s.memberSettings.canRegister?'26px':'4px'};width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4);transition:left .18s ease`,
-      reqConfKnob: `position:absolute;top:4px;left:${s.memberSettings.requireConfirmation?'26px':'4px'};width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4);transition:left .18s ease`,
-      canSubmitKnob: `position:absolute;top:4px;left:${s.memberSettings.canSubmit?'26px':'4px'};width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4);transition:left .18s ease`,
-      canCommentKnob: `position:absolute;top:4px;left:${s.memberSettings.canComment?'26px':'4px'};width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4);transition:left .18s ease`,
-      modCommentKnob: `position:absolute;top:4px;left:${s.memberSettings.moderateComments?'26px':'4px'};width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4);transition:left .18s ease`,
+      canRegisterStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canRegister?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.canRegister?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.canRegister?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      reqConfStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.requireConfirmation?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.requireConfirmation?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.requireConfirmation?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      canSubmitStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canSubmit?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.canSubmit?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.canSubmit?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      canCommentStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.canComment?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.canComment?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.canComment?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      modCommentStyle: `flex:none;width:50px;height:28px;border-radius:999px;cursor:pointer;position:relative;background:${s.memberSettings.moderateComments?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.memberSettings.moderateComments?'transparent':'var(--line2)'};box-shadow:${s.memberSettings.moderateComments?'0 0 0 3px rgba(255,46,99,.15)':'none'};transition:background .18s ease,box-shadow .18s ease,border-color .18s ease`,
+      canRegisterKnob: `position:absolute;top:3px;left:${s.memberSettings.canRegister?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
+      reqConfKnob: `position:absolute;top:3px;left:${s.memberSettings.requireConfirmation?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
+      canSubmitKnob: `position:absolute;top:3px;left:${s.memberSettings.canSubmit?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
+      canCommentKnob: `position:absolute;top:3px;left:${s.memberSettings.canComment?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
+      modCommentKnob: `position:absolute;top:3px;left:${s.memberSettings.moderateComments?'25px':'3px'};width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15);transition:left .18s cubic-bezier(.4,0,.2,1)`,
       // wallpaper defaults
       wallDefaults: s.wallDefaults,
       setWDPerPage: (e)=>this.setWallDefault('perPage',e), setWDRelated: (e)=>this.setWallDefault('related',e),
@@ -3880,7 +4144,7 @@ class Component extends DCLogic {
       setWDThumbW: (e)=>this.setWallDefault('thumbW',e), setWDThumbH: (e)=>this.setWallDefault('thumbH',e),
       setWDPreviewW: (e)=>this.setWallDefault('previewW',e), setWDPreviewH: (e)=>this.setWallDefault('previewH',e),
       toggleWDPagination: ()=>this.setWallDefault('showPagination',!s.wallDefaults.showPagination),
-      wdPaginationStyle: `width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;background:${s.wallDefaults.showPagination?'#30a46c':'var(--track)'}`,
+      wdPaginationStyle: `flex:none;width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.wallDefaults.showPagination?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.wallDefaults.showPagination?'transparent':'var(--line2)'};box-shadow:${s.wallDefaults.showPagination?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
       showAds: this.props.showAds ?? true,
       goHome: this.goHome, goUpload: this.goUpload, goProfile: this.goProfile,
       hero, grid, cats, resChips, colors, sorts, jumper, active,
@@ -4116,6 +4380,102 @@ class Component extends DCLogic {
       bulkDelete: this.bulkDelete,
       // admin
       kpiPending: pendingCount, weekly, topCats, activity, pending, adminNav, goAdmin,
+      // ---- admin: collections ----
+      adminCollectionsSearch: s.adminCollectionsSearch, setAdminCollectionsSearch: this.setAdminCollectionsSearch,
+      openNewCollectionModal: this.openNewCollectionModal, closeCollectionModal: this.closeCollectionModal,
+      setCollectionModalName: this.setCollectionModalName, setCollectionModalDesc: this.setCollectionModalDesc,
+      toggleCollectionModalFeatured: this.toggleCollectionModalFeatured, saveCollectionModal: this.saveCollectionModal,
+      adminCollectionsFilterTabs: ['All','Featured','Pending','Published'].map(f => {
+        const on = s.adminCollectionsFilter === f;
+        return { label:f, select:()=>this.setAdminCollectionsFilter(f),
+          style:`padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;background:${on?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'transparent'};color:${on?'#fff':'var(--muted)'}` };
+      }),
+      adminCollectionsRows: (() => {
+        const CATS={Nature:'#30a46c',Space:'#22d3ee',Abstract:'#8b5cf6',Cars:'#f5c518',Architecture:'#ff7a45'};
+        const SEEDS=['aurora','space1','nat1','cyber1','car1','arch1','nat2','retro1','nat3','car2','lo1','macro1'];
+        const base = this.COLLECTIONS.map((c,i) => ({ ...c, thumbSeed: SEEDS[i%SEEDS.length] }));
+        const all = [...base, ...s.adminCollectionsNew.map((c,i) => ({ ...c, thumbSeed: SEEDS[(i+3)%SEEDS.length] }))]
+          .filter(c => !s.adminCollectionDeleted.includes(c.id));
+        const q = (s.adminCollectionsSearch||'').trim().toLowerCase();
+        return all.filter(c => {
+          const featured = s.adminCollectionFeaturedOverride[c.id] !== undefined ? s.adminCollectionFeaturedOverride[c.id] : c.featured;
+          const status = s.adminCollectionStatusOverride[c.id] || (featured ? 'Featured' : 'Published');
+          if (s.adminCollectionsFilter === 'Featured' && !featured) return false;
+          if (s.adminCollectionsFilter === 'Pending' && status !== 'pending') return false;
+          if (s.adminCollectionsFilter === 'Published' && (status === 'pending' || featured)) return false;
+          if (q && !c.name.toLowerCase().includes(q) && !c.curator.toLowerCase().includes(q)) return false;
+          return true;
+        }).map(c => {
+          const edit = s.adminCollectionEdits[c.id] || {};
+          const name = edit.name || c.name, category = edit.category || c.category, desc = edit.desc !== undefined ? edit.desc : c.desc;
+          const featured = s.adminCollectionFeaturedOverride[c.id] !== undefined ? s.adminCollectionFeaturedOverride[c.id] : c.featured;
+          const statusRaw = s.adminCollectionStatusOverride[c.id] || (featured ? 'featured' : 'published');
+          const STATUS_COL = { pending:'#f5c518', featured:'#ff2e63', published:'#30a46c' };
+          const col = CATS[category]||'#9a9aa3';
+          return { ...c, name, category, desc, featured,
+            statusLabel: statusRaw==='pending'?'Pending review':statusRaw==='featured'?'Featured':'Published',
+            statusStyle: `color:${STATUS_COL[statusRaw]};background:${STATUS_COL[statusRaw]}1f;border:1px solid ${STATUS_COL[statusRaw]}44;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:700`,
+            catStyle: `background:${col}18;color:${col};border:1px solid ${col}44;padding:3px 9px;border-radius:6px;font-size:10.5px;font-weight:700`,
+            savesF: this.fmt(c.saves||0), curatorAvatar: this.avatar(c.curatorAv),
+            thumb: `https://picsum.photos/seed/${c.thumbSeed}/120/68`,
+            featureBtnStyle: `width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:${featured?'#f5c518':'var(--dim2)'};border:1px solid ${featured?'#f5c51855':'var(--line)'};background:${featured?'rgba(245,197,24,.1)':'transparent'}`,
+            toggleFeature: () => this.toggleFeatureCollection(c.id, featured),
+            edit: () => this.openEditCollectionModal({ id:c.id, name, category, desc, featured }),
+            remove: () => this.deleteCollectionAdmin(c.id, name),
+          };
+        });
+      })(),
+      adminCollectionsCount: (() => {
+        const all = [...this.COLLECTIONS, ...s.adminCollectionsNew].filter(c => !s.adminCollectionDeleted.includes(c.id));
+        return all.length;
+      })(),
+      hasCollectionModal: !!s.adminCollectionModal,
+      collectionModalTitle: s.adminCollectionModal && s.adminCollectionModal.mode==='new' ? 'New collection' : 'Edit collection',
+      collectionModalSaveLabel: s.adminCollectionModal && s.adminCollectionModal.mode==='new' ? 'Create collection' : 'Save changes',
+      collectionModalName: s.adminCollectionModal ? s.adminCollectionModal.name : '',
+      collectionModalDesc: s.adminCollectionModal ? s.adminCollectionModal.desc : '',
+      collectionCategoryChips: ['Nature','Space','Abstract','Cars','Architecture'].map(cat => {
+        const on = s.adminCollectionModal && s.adminCollectionModal.category === cat;
+        return { label:cat, select:()=>this.setCollectionModalCategory(cat),
+          style:`padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid ${on?'transparent':'var(--line2)'};background:${on?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};color:${on?'#fff':'var(--muted)'}` };
+      }),
+      collectionModalFeaturedSwitchStyle: `width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${s.adminCollectionModal && s.adminCollectionModal.featured ?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${s.adminCollectionModal && s.adminCollectionModal.featured ?'transparent':'var(--line2)'};box-shadow:${s.adminCollectionModal && s.adminCollectionModal.featured ?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+      collectionModalFeaturedKnobStyle: s.adminCollectionModal && s.adminCollectionModal.featured ? 'position:absolute;top:3px;left:23px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)' : 'position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)',
+      // ---- admin: community ----
+      isAdmComFeed: s.adminCommunityTab==='feed', isAdmComChallenges: s.adminCommunityTab==='challenges',
+      setAdmComFeed: ()=>this.setAdminCommunityTab('feed'), setAdmComChallenges: ()=>this.setAdminCommunityTab('challenges'),
+      admComFeedTabStyle: `display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;background:${s.adminCommunityTab==='feed'?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'transparent'};color:${s.adminCommunityTab==='feed'?'#fff':'var(--muted)'}`,
+      admComChallengesTabStyle: `padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;background:${s.adminCommunityTab==='challenges'?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'transparent'};color:${s.adminCommunityTab==='challenges'?'#fff':'var(--muted)'}`,
+      hasFlaggedPosts: (s.adminFeedFlagged||[]).length > 0,
+      flaggedCount: (s.adminFeedFlagged||[]).length,
+      adminFeedRows: s.communityFeed.filter(item => !(s.adminFeedRemoved||[]).includes(item.id)).map(item => {
+        const TYPE = { upload:{bg:'rgba(255,46,99,.13)',col:'#ff6a8a',lbl:'Uploaded'}, comment:{bg:'rgba(34,211,238,.12)',col:'#22d3ee',lbl:'Commented'}, milestone:{bg:'rgba(245,197,24,.13)',col:'#f5c518',lbl:'Achievement'} };
+        const t = TYPE[item.type]||TYPE.upload;
+        const flagged = (s.adminFeedFlagged||[]).includes(item.id);
+        const summary = item.type==='upload' ? `Uploaded "${item.title}" in ${item.category}` : item.type==='comment' ? `"${item.text}" on ${item.wallTitle}` : item.milestone;
+        return { ...item, avatar:this.avatar(item.av), typeIconBg:t.bg, typeIconCol:t.col, typeLabel:t.lbl, flagged, summary,
+          approve: ()=>this.approveFeedItem(item.id), remove: ()=>this.removeFeedItem(item.id) };
+      }),
+      openNewChallengeModal: this.openNewChallengeModal, closeChallengeModal: this.closeChallengeModal,
+      saveChallengeModal: this.saveChallengeModal,
+      setChallengeModalTitle: (e)=>this.setChallengeModalField('title', e),
+      setChallengeModalDesc: (e)=>this.setChallengeModalField('desc', e),
+      setChallengeModalPrize: (e)=>this.setChallengeModalField('prize', e),
+      setChallengeModalDeadline: (e)=>this.setChallengeModalField('deadline', e),
+      adminChallengeRows: s.communityChallenges.map(ch => ({ ...ch,
+        edit: ()=>this.openEditChallengeModal(ch), remove: ()=>this.deleteChallengeAdmin(ch.id, ch.title) })),
+      hasChallengeModal: !!s.adminChallengeModal,
+      challengeModalTitle: s.adminChallengeModal && s.adminChallengeModal.mode==='new' ? 'New challenge' : 'Edit challenge',
+      challengeModalSaveLabel: s.adminChallengeModal && s.adminChallengeModal.mode==='new' ? 'Create challenge' : 'Save changes',
+      challengeModalTitleVal: s.adminChallengeModal ? s.adminChallengeModal.title : '',
+      challengeModalDesc: s.adminChallengeModal ? s.adminChallengeModal.desc : '',
+      challengeModalPrize: s.adminChallengeModal ? s.adminChallengeModal.prize : '',
+      challengeModalDeadline: s.adminChallengeModal ? s.adminChallengeModal.deadline : '',
+      challengeColorChips: ['#ff2e63','#f5c518','#22d3ee','#8b5cf6','#30a46c'].map(color => {
+        const on = s.adminChallengeModal && s.adminChallengeModal.color === color;
+        return { color, select:()=>this.setChallengeModalColor(color),
+          style:`width:26px;height:26px;border-radius:50%;background:${color};cursor:pointer;border:2px solid ${on?'var(--text)':'transparent'};box-shadow:0 0 0 1px ${on?color:'transparent'}` };
+      }),
       goModeration: () => { window.scrollTo(0,0); this.setState({screen:'moderation'}); },
       get4K: activeRes[0].download,
       hasPending: pendingCount > 0, hasPendingNot: pendingCount === 0,
@@ -4184,8 +4544,8 @@ class Component extends DCLogic {
       languages: s.languages.map(l => ({ ...l, flag: ({en:'🇬🇧',es:'🇪🇸',fr:'🇫🇷',de:'🇩🇪',ja:'🇯🇵',zh:'🇨🇳',pt:'🇧🇷',ar:'🇸🇦',hi:'🇮🇳',ko:'🇰🇷',it:'🇮🇹',ru:'🇷🇺'})[l.code]||'🌐',
         toggle: () => this.toggleLanguage(l.code),
         setDefault: () => this.setDefaultLang(l.code),
-        toggleStyle:`width:42px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s;background:${l.enabled?'#30a46c':'var(--track)'}`,
-        knobStyle:`position:absolute;top:2px;left:${l.enabled?'20px':'2px'};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s`,
+        toggleStyle:`width:44px;height:24px;border-radius:999px;cursor:pointer;position:relative;transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;background:${l.enabled?'linear-gradient(135deg,#ff2e63,#ff6a3d)':'var(--surface2)'};border:1px solid ${l.enabled?'transparent':'var(--line2)'};box-shadow:${l.enabled?'0 0 0 3px rgba(255,46,99,.15)':'none'}`,
+        knobStyle:`position:absolute;top:3px;left:${l.enabled?'23px':'3px'};width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 2px rgba(0,0,0,.25),0 1px 4px rgba(0,0,0,.15)`,
         defaultStyle:`font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;cursor:pointer;${l.isDefault?'background:rgba(255,46,99,.14);color:#ff2e63;border:1px solid rgba(255,46,99,.3)':'background:var(--surface2);color:var(--muted);border:1px solid var(--line)'}`,
         pctBarStyle:`width:${l.pct}%;height:5px;border-radius:999px;background:${l.enabled?'linear-gradient(90deg,#ff2e63,#ff6a3d)':'var(--track)'}`,
       })),

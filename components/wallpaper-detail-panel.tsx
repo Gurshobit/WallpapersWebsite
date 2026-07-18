@@ -8,6 +8,7 @@ import { SITE_URL } from "@/lib/routing";
 import { formatCount } from "@/lib/format";
 import { wallpaperDownloadPath } from "@/lib/wallpaper-urls";
 import { DownloadModal } from "./wallpaper-card";
+import { RichContent } from "./rich-content";
 
 // ── resolution types ──────────────────────────────────────────────────────────
 
@@ -486,9 +487,7 @@ export function WallpaperDetailPanel(props: DetailPanelProps) {
                   <div className="text-[11px] font-bold uppercase tracking-[0.6px] mb-1.5" style={{ color: "var(--dim2)" }}>
                     Description
                   </div>
-                  <p className="text-[13.5px] leading-relaxed" style={{ color: "var(--text3)" }}>
-                    {props.description}
-                  </p>
+                  <RichContent html={props.description} className="rte-prose rte-prose-sm" />
                 </div>
               )}
             </div>

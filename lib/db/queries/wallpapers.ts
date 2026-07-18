@@ -571,6 +571,14 @@ export async function toggleLike(userId: number, wallpaperId: number, like: bool
   return { action: "added" };
 }
 
+export async function getLikedWallpaperIds(userId: number) {
+  const rows = await db
+    .select({ wallpaperId: ratings.wallpaperId })
+    .from(ratings)
+    .where(and(eq(ratings.userId, userId), eq(ratings.iLike, true)));
+  return rows.map((r) => r.wallpaperId);
+}
+
 export async function getAllActiveSlugs() {
   return db
     .select({ slug: wallpapers.slug, dateAdded: wallpapers.dateAdded })

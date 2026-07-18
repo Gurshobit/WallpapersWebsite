@@ -68,8 +68,17 @@ img.site-logo {
   transition: filter 0.25s ease;
 }
 
-:root[data-theme="light"] img.site-logo {
-  filter: brightness(0.92) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12));
+/* Theme-aware logo swap: dark variant on dark theme, light variant on light theme */
+img.site-logo-light {
+  display: none;
+}
+
+:root[data-theme="light"] img.site-logo-dark {
+  display: none;
+}
+
+:root[data-theme="light"] img.site-logo-light {
+  display: inline-block;
 }
 
 .hd-sort-tab .hd-sort-lbl {
@@ -488,3 +497,13 @@ img.site-logo {
 .rte-prose a { color: #ff6a8a; text-decoration: underline; }
 .rte-prose strong { font-weight: 700; }
 .rte-prose em { font-style: italic; }
+
+/* ── Compact rich-text display (inline fields: descriptions, bios, comments) ── */
+.rte-prose-sm p { font-size: 13.5px; line-height: 1.6; margin: 0 0 0.6em; color: var(--text3); }
+.rte-prose-sm p:last-child { margin-bottom: 0; }
+.rte-prose-sm li { font-size: 13.5px; line-height: 1.55; color: var(--text3); }
+.rte-prose-sm h1 { font-size: 1.3em; margin: 0.4em 0 0.3em; }
+.rte-prose-sm h2 { font-size: 1.15em; margin: 0.6em 0 0.3em; }
+.rte-prose-sm h3 { font-size: 1.05em; margin: 0.5em 0 0.25em; }
+.rte-prose-sm ul, .rte-prose-sm ol { margin: 0 0 0.6em; }
+.rte-prose-sm blockquote { margin: 0 0 0.6em; }

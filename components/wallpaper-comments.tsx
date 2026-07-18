@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { RichTextEditor } from "@/components/rich-text-editor";
+
+function hasText(html: string) {
+  return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim().length > 0;
+}
 
 export function WallpaperComments({
   wallpaperId,
@@ -43,7 +48,7 @@ export function WallpaperComments({
     e.preventDefault();
     setError(null);
     setFeedback(null);
-    if (!message.trim()) return;
+    if (!hasText(message)) return;
 
     setLoading(true);
     try {
@@ -71,19 +76,14 @@ export function WallpaperComments({
 
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="mb-6">
-      <textarea
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        rows={3}
-        placeholder="Share your thoughts…"
-        maxLength={2000}
-        className="w-full rounded-xl px-4 py-3 text-sm outline-none resize-y mb-2"
-        style={{
-          background: "var(--surface)",
-          border: "1px solid var(--line2)",
-          color: "var(--text)",
-        }}
-      />
+      <div className="mb-2">
+        <RichTextEditor
+          content={message}
+          onChange={setMessage}
+          placeholder="Share your thoughts…"
+          minHeight={110}
+        />
+      </div>
       {error && <p className="text-sm text-red-400 mb-2">{error}</p>}
       {feedback && (
         <p className="text-sm mb-2" style={{ color: "#30a46c" }}>
@@ -92,7 +92,7 @@ export function WallpaperComments({
       )}
       <button
         type="submit"
-        disabled={loading || !message.trim()}
+        disabled={loading || !hasText(message)}
         className="rounded-[10px] px-4 py-2 text-[13.5px] font-bold text-white disabled:opacity-50 cursor-pointer"
         style={{
           background: "linear-gradient(135deg, #ff2e63, #ff6a3d)",

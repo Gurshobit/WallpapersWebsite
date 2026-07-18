@@ -156,7 +156,10 @@
     "newPassword": "Nova senha",
     "confirmPassword": "Confirmar nova senha",
     "minPassword": "Mínimo 8 caracteres",
-    "changePasswordBtn": "Alterar senha"
+    "changePasswordBtn": "Alterar senha",
+    "saved": "Settings saved",
+    "currentEmail": "Current email",
+    "passwordMismatch": "Passwords do not match"
   },
   "upload": {
     "pageTitle": "Enviar papel de parede",

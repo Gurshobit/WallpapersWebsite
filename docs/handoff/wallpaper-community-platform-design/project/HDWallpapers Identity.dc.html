@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</helmet>
+
+<div style="width:max-content;min-width:100%;min-height:100vh;padding:48px;box-sizing:border-box;background:#e7e5df;font-family:'Space Grotesk',sans-serif;">
+
+  <!-- Header -->
+  <div style="margin-bottom:36px;">
+    <p style="margin:0 0 5px;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#999;font-family:'Space Grotesk',sans-serif;">Brand Identity System</p>
+    <h1 style="margin:0 0 6px;font-size:32px;font-weight:700;color:#1a1a1a;letter-spacing:-.025em;font-family:'Space Grotesk',sans-serif;"><span style="color:#2C3178;">HD</span> Wallpapers<span style="color:#EF4141;">.site</span></h1>
+    <p style="margin:0;font-size:14px;color:#777;font-family:'Space Grotesk',sans-serif;">Logo lockups · Color palette · HD wallpapers — light &amp; dark</p>
+  </div>
+
+  <!-- Brand Colors -->
+  <div style="margin-bottom:40px;">
+    <p style="margin:0 0 14px;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#aaa;font-family:'Space Grotesk',sans-serif;">Brand Colors</p>
+    <div style="display:flex;gap:12px;align-items:flex-start;">
+      <div style="flex:none;">
+        <div style="width:60px;height:60px;background:#2C3178;border-radius:6px;"></div>
+        <p style="margin:6px 0 1px;font-size:10px;color:#555;font-family:'Space Grotesk',sans-serif;letter-spacing:.01em;">#2C3178</p>
+        <p style="margin:0;font-size:9px;color:#aaa;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Navy</p>
+      </div>
+      <div style="flex:none;">
+        <div style="width:60px;height:60px;background:#EF4141;border-radius:6px;"></div>
+        <p style="margin:6px 0 1px;font-size:10px;color:#555;font-family:'Space Grotesk',sans-serif;letter-spacing:.01em;">#EF4141</p>
+        <p style="margin:0;font-size:9px;color:#aaa;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Red</p>
+      </div>
+      <div style="flex:none;">
+        <div style="width:60px;height:60px;background:#FFD03A;border-radius:6px;"></div>
+        <p style="margin:6px 0 1px;font-size:10px;color:#555;font-family:'Space Grotesk',sans-serif;letter-spacing:.01em;">#FFD03A</p>
+        <p style="margin:0;font-size:9px;color:#aaa;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Yellow</p>
+      </div>
+      <div style="flex:none;">
+        <div style="width:60px;height:60px;background:#79A841;border-radius:6px;"></div>
+        <p style="margin:6px 0 1px;font-size:10px;color:#555;font-family:'Space Grotesk',sans-serif;letter-spacing:.01em;">#79A841</p>
+        <p style="margin:0;font-size:9px;color:#aaa;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;letter-spacing:.06em;">Green</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logo Lockups -->
+  <div style="margin-bottom:44px;">
+    <p style="margin:0 0 16px;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#aaa;font-family:'Space Grotesk',sans-serif;">Logo Lockups</p>
+    <div style="display:flex;gap:20px;align-items:flex-start;">
+
+      <!-- A: Light Horizontal -->
+      <div style="flex:none;width:420px;">
+        <p style="margin:0 0 8px;font-size:11px;color:#aaa;font-family:'Space Grotesk',sans-serif;">A — Horizontal · Light</p>
+        <div style="background:#fff;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:36px 40px;display:flex;align-items:center;gap:18px;">
+          {{ iconSm }}
+          <div>
+            <div style="font-size:28px;font-weight:700;line-height:1;color:#1a1a1a;letter-spacing:-.025em;font-family:'Space Grotesk',sans-serif;"><span style="color:#2C3178;">HD</span> Wallpapers</div>
+            <div style="font-size:16px;font-weight:400;color:#EF4141;margin-top:4px;letter-spacing:.05em;font-family:'Space Grotesk',sans-serif;">.site</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B: Stacked -->
+      <div style="flex:none;width:220px;">
+        <p style="margin:0 0 8px;font-size:11px;color:#aaa;font-family:'Space Grotesk',sans-serif;">B — Stacked · Light</p>
+        <div style="background:#fff;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:36px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+          {{ iconMd }}
+          <div style="text-align:center;">
+            <div style="font-size:19px;font-weight:700;line-height:1.1;color:#1a1a1a;letter-spacing:-.015em;font-family:'Space Grotesk',sans-serif;"><span style="color:#2C3178;">HD</span> Wallpapers</div>
+            <div style="font-size:13px;font-weight:400;color:#EF4141;margin-top:3px;font-family:'Space Grotesk',sans-serif;">.site</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- C: Dark Horizontal -->
+      <div style="flex:none;width:420px;">
+        <p style="margin:0 0 8px;font-size:11px;color:#aaa;font-family:'Space Grotesk',sans-serif;">C — Horizontal · Dark</p>
+        <div style="background:#0D0F1C;border-radius:3px;box-shadow:0 2px 8px rgba(0,0,0,.3);padding:36px 40px;display:flex;align-items:center;gap:18px;">
+          {{ iconSmDk }}
+          <div>
+            <div style="font-size:28px;font-weight:700;line-height:1;color:#fff;letter-spacing:-.025em;font-family:'Space Grotesk',sans-serif;"><span style="color:#8088d4;">HD</span> Wallpapers</div>
+            <div style="font-size:16px;font-weight:400;color:#EF4141;margin-top:4px;letter-spacing:.05em;font-family:'Space Grotesk',sans-serif;">.site</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Wallpaper Previews -->
+  <div>
+    <p style="margin:0 0 16px;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#aaa;font-family:'Space Grotesk',sans-serif;">HD Wallpapers — 1920 × 1080</p>
+
+    <!-- Row 1: Light -->
+    <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;">
+
+      <!-- 1: Light Minimal -->
+      <div style="flex:none;">
+        <p style="margin:0 0 8px;font-size:11px;color:#aaa;font-family:'Space Grotesk',sans-serif;">1 — Light · Minimal</p>
+        <div style="width:960px;height:540px;overflow:hidden;border-radius:3px;box-shadow:0 1px 4px rgba(0,0,0,.12);">
+          <div style="width:1920px;height:1080px;transform:scale(0.5);transform-origin:top left;position:relative;background:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            {{ iconWp }}
+            <div style="margin-top:30px;text-align:center;font-family:'Space Grotesk',sans-serif;">
+              <div style="font-size:58px;font-weight:700;line-height:1;color:#1a1a1a;letter-spacing:-.025em;"><span style="color:#2C3178;">HD</span> Wallpapers</div>
+              <div style="font-size:36px;font-weight:300;color:#EF4141;margin-top:10px;letter-spacing:.07em;">.site</div>
+            </div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:12px;display:flex;">
+              <div style="flex:1;background:#2C3178;"></div>
+              <div style="flex:1;background:#EF4141;"></div>
+              <div style="flex:1;background:#FFD03A;"></div>
+              <div style="flex:1;background:#79A841;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2: Light Editorial -->
+      <div style="flex:none;">
+        <p style="margin:0 0 8px;font-size:11px;color:#aaa;font-family:'Space Grotesk',sans-serif;">2 — Light · Editorial</p>
+        <div style="width:960px;height:540px;overflow:hidden;border-radius:3px;box-shadow:0 1px 4px rgba(0,0,0,.12);">
+          <div style="width:1920px;height:1080px;transform:scale(0.5);transform-origin:top left;position:relative;background:#F5F2EC;overflow:hidden;">
+            <div style="position:absolute;right:-50px;top:40px;opacity:0.07;pointer-events:none;">{{ iconHuge }}</div>
+            <div style="position:absolute;left:0;top:0;bottom:0;width:16px;display:flex;flex-direction:column;">
+              <div style="flex:1;background:#2C3178;"></div>
+              <div style="flex:1;background:#EF4141;"></div>
+              <div style="flex:1;background:#FFD03A;"></div>
+              <div style="flex:1;background:#79A841;"></div>
+            </div>
+            <div style="position:absolute;left:80px;top:0;bottom:0;right:80px;display:flex;align-items:center;gap:72px;">
+              {{ iconWpEd }}
+              <div style="font-family:'Space Grotesk',sans-serif;">
+                <div style="font-size:164px;font-weight:700;line-height:.88;color:#2C3178;letter-spacing:-.04em;">HD</div>
+                <div style="font-size:90px;font-weight:700;line-height:1;color:#1a1a1a;letter-spacing:-.025em;"> Wallpapers</div>
+                <div style="font-size:50px;font-weight:300;color:#EF4141;margin-top:18px;letter-spacing:.07em;">.site</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 2: Dark -->
+    <div style="display:flex;gap:20px;align-items:flex-start;">
+
+      <!-- 3: Dark Midnight -->
+      <div style="flex:none;">
+        <p style="margin:0 0 8px;font-size:11px;color:#aaa;font-family:'Space Grotesk',sans-serif;">3 — Dark · Midnight</p>
+        <div style="width:960px;height:540px;overflow:hidden;border-radius:3px;box-shadow:0 2px 8px rgba(0,0,0,.4);">
+          <div style="width:1920px;height:1080px;transform:scale(0.5);transform-origin:top left;position:relative;background:#090C14;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+            <div style="position:absolute;width:720px;height:720px;border-radius:50%;background:radial-gradient(circle,rgba(44,49,120,0.5) 0%,transparent 70%);left:600px;top:30px;pointer-events:none;"></div>
+            <div style="position:relative;z-index:1;">{{ iconWpD }}</div>
+            <div style="position:relative;z-index:1;margin-top:30px;text-align:center;font-family:'Space Grotesk',sans-serif;">
+              <div style="font-size:58px;font-weight:700;line-height:1;color:#fff;letter-spacing:-.025em;"><span style="color:#8088d4;">HD</span> Wallpapers</div>
+              <div style="font-size:36px;font-weight:300;color:#EF4141;margin-top:10px;letter-spacing:.07em;">.site</div>
+            </div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:12px;display:flex;">
+              <div style="flex:1;background:#2C3178;"></div>
+              <div style="flex:1;background:#EF4141;"></div>
+              <div style="flex:1;background:#FFD03A;"></div>
+              <div style="flex:1;background:#79A841;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4: Dark Vivid -->
+      <div style="flex:none;">
+        <p style="margin:0 0 8px;font-size:11px;color:#aaa;font-family:'Space Grotesk',sans-serif;">4 — Dark · Vivid</p>
+        <div style="width:960px;height:540px;overflow:hidden;border-radius:3px;box-shadow:0 2px 8px rgba(0,0,0,.4);">
+          <div style="width:1920px;height:1080px;transform:scale(0.5);transform-origin:top left;position:relative;background:#07080F;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+            <div style="position:absolute;width:740px;height:740px;border-radius:50%;background:radial-gradient(circle,rgba(44,49,120,0.6) 0%,transparent 70%);left:590px;top:20px;"></div>
+            <div style="position:absolute;width:440px;height:440px;border-radius:50%;background:radial-gradient(circle,rgba(239,65,65,0.32) 0%,transparent 70%);left:420px;top:420px;"></div>
+            <div style="position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(121,168,65,0.28) 0%,transparent 70%);left:1090px;top:290px;"></div>
+            <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,208,58,0.22) 0%,transparent 70%);left:1300px;top:640px;"></div>
+            <div style="position:relative;z-index:1;">{{ iconWpDLg }}</div>
+            <div style="position:relative;z-index:1;margin-top:34px;text-align:center;font-family:'Space Grotesk',sans-serif;">
+              <div style="font-size:66px;font-weight:700;line-height:1;color:#fff;letter-spacing:-.025em;"><span style="color:#8088d4;">HD</span> Wallpapers</div>
+              <div style="font-size:42px;font-weight:300;color:#EF4141;margin-top:12px;letter-spacing:.07em;">.site</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  icon(mono, screen, sz) {
+    const h = React.createElement;
+    const cp = (fill, d, k) => h('path', {key:k, fill, fillRule:'evenodd', clipRule:'evenodd', d});
+    const mp = (d, k) => h('path', {key:k, style:{fill:mono}, fillRule:'evenodd', clipRule:'evenodd', d});
+    return h('svg', {viewBox:'0 0 2048 2048', width:sz, height:sz, style:{display:'block', flexShrink:0}},
+      mp('M1857.751,410.835H181.217C134.398,410.835,96,449.892,96,497.52v1125.696c0,47.63,38.398,86.439,85.217,86.439h1676.535c46.572,0,84.964-38.81,84.964-86.439V497.52C1942.715,449.892,1904.323,410.835,1857.751,410.835z','frm'),
+      h('rect',{key:'scr',x:'207.971',y:'524.739',width:'1622.782',height:'1071.012',style:{fill:screen}}),
+      cp('#79A841','M633.794,1244.208c-67.628,63.249-80.999,176.402-33.445,254.522c56.975,93.235,172.407,97.021,332.186,97.021h898.218V524.739H478.717L633.794,1244.208z','g1'),
+      cp('#79A841','M633.046,1244.957c-67.131,63.257-80.006,175.9-32.697,253.773c55.243,90.212,165.223,96.518,317.325,97.021l0,0h7.436h7.425h898.218v-276.952H901.078C901.078,1318.799,765.08,1316.278,633.046,1244.957z','g2'),
+      cp('#FFD03A','M633.794,1018.414c-67.628,56.195-80.999,156.736-33.445,226.042c56.975,82.91,172.407,86.44,332.186,86.44h898.218v-276.949H901.078c0,0-142.939-2.771-277.938-79.384L633.794,1018.414z','y'),
+      cp('#EF4141','M633.794,753.563c-67.628,56.188-80.999,156.746-33.445,226.039c56.975,82.911,172.407,86.438,332.186,86.438h898.218V789.091H901.078c0,0-142.939-2.77-277.938-79.383L633.794,753.563z','r'),
+      cp('#2C3178','M600.349,714.747c56.975,82.912,172.407,86.44,332.186,86.44h898.218V524.739H533.469C557.992,625.79,516.126,592.023,600.349,714.747z','nv'),
+      mp('M611.253,1952.33h145.155c57.971,0,105.285-22.177,105.285-81.146v-98.782h315.339v98.782c0,58.97,47.072,81.146,105.033,81.146h145.412c68.616,0,68.616,65.269,0,65.269H611.253C542.633,2017.599,542.633,1952.33,611.253,1952.33z','std'),
+      mp('M499.282,1484.362c-8.912-22.429-16.344-46.619-23.286-70.053c-10.156-34.026-19.569-68.292-28.983-102.566c-23.282-87.702-45.08-175.65-65.89-263.85c-28.242-118.438-55.244-238.394-79.025-357.842c-53.752-270.396,29.973-448.058,321.539-394.89l227.4,974.491l-67.878-13.606c-49.042-9.828-100.068-4.279-141.94,24.693c-33.685,23.441-57.71,59.727-64.898,100.803c-4.215,23.69-2.476,48.137,5.451,71.066l14.367,41.324l-80.511,31L499.282,1484.362z','lft'),
+      cp('#2C3178','M333.807,611.428c-33.194-177.412,58.215-317.272,262.082-273.174l195.943,873.692c-183.065-37.045-297.749,122.478-251.678,255.536C499.282,1365.418,373.441,822.855,333.807,611.428z','ln'),
+      cp('#EF4141','M647.168,566.57l83.729,373.974l-72.58,137.338c0,0-124.356,113.904-202.631,82.16c-37.655-154.734-72.089-304.677-98.593-432.697C371.212,545.147,551.8,497.273,647.168,566.57z','lr'),
+      cp('#FFD03A','M690.518,760.609l84.718,377.757l-43.099,68.294c-99.091,3.019-169.934,66.273-193.716,143.38c-11.642,2.02-23.037,2.526-33.936,1.016c-31.463-115.415-64.413-249.99-99.829-407.742C396.232,762.125,574.089,712.479,690.518,760.609z','ly'),
+      cp('#79A841','M741.551,987.916l50.281,224.03c-183.065-37.045-297.749,122.478-251.678,255.536c-18.577-46.625-46.568-150.198-84.468-307.44C453.948,999.512,625.867,926.939,741.551,987.916z','lg'),
+      h('path',{key:'fn',fill:'#2C3178',d:'M367.499,99.107c50.034,135.573-55.244,239.658-55.487,240.16c12.879-38.813,20.802-93.242-27.747-209.167C252.31,53.24,338.515,20.737,367.499,99.107z'}),
+      h('path',{key:'fr2',fill:'#EF4141',d:'M221.344,236.7c76.545,27.216,56.728,119.45,56.728,119.956c-6.435-17.891-20.81-36.042-65.643-53.172C161.399,284.076,177.748,221.076,221.344,236.7z'}),
+      cp('#FFF','M978.863,1314.506c74.063,41.595,167.199,9.842,222.444-16.12c0,0-94.878,66.02-170.423,43.09c44.088,20.414,85.212,37.044,134.759,27.472c0,0-20.067,9.572-40.636,13.103c90.418,32.004,305.194,4.286,399.319-131.295c85.467-122.974,65.148-253.766-56.964-285.765C1132.939,877.292,1248.867,1352.819,978.863,1314.506z','w1'),
+      cp('#FFF','M1587.496,1010.849l189.259-241.159c0,0-32.2-152.215-222.451-130.039l-150.365,281.995c47.317-8.322,93.639,3.018,132.033,31.747l170.432-152.206L1566.697,982.12C1574.122,990.945,1581.303,1000.519,1587.496,1010.849z','w2'),
+      cp('#FFF','M1588.24,603.109c0,0,143.177-25.956,201.89,119.453L2048,394.204c-87.694-45.615-174.883-97.019-277.688-116.426L1588.24,603.109z','w3'),
+    );
+  }
+
+  renderVals() {
+    const L = '#1a1a1a', LS = '#111', D = '#e8e8f0', DS = '#0c0e1a';
+    return {
+      iconSm:    this.icon(L, LS, 64),
+      iconMd:    this.icon(L, LS, 96),
+      iconSmDk:  this.icon(D, DS, 64),
+      iconWp:    this.icon(L, LS, 280),
+      iconWpEd:  this.icon(L, LS, 340),
+      iconWpD:   this.icon(D, DS, 280),
+      iconWpDLg: this.icon(D, DS, 360),
+      iconHuge:  this.icon(L, LS, 900),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -156,7 +156,10 @@
     "newPassword": "新しいパスワード",
     "confirmPassword": "新しいパスワードを確認",
     "minPassword": "最低8文字",
-    "changePasswordBtn": "パスワードを変更"
+    "changePasswordBtn": "パスワードを変更",
+    "saved": "Settings saved",
+    "currentEmail": "Current email",
+    "passwordMismatch": "Passwords do not match"
   },
   "upload": {
     "pageTitle": "壁紙をアップロード",

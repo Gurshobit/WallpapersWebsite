@@ -7,6 +7,7 @@ import { CategoryChipPicker } from "./upload/category-chip-picker";
 import { TagInput } from "./upload/tag-input";
 import { LicensePicker } from "./upload/license-picker";
 import { PreviewEditModal, type CropParams } from "./upload/preview-edit-modal";
+import { RichTextEditor } from "./rich-text-editor";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,6 +42,7 @@ interface UploadZoneProps {
   licenses: { id: number; name: string }[];
   resolutionGroups: ResGroup[];
   username: string;
+  challengeId?: number;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -100,6 +102,7 @@ export function UploadZone({
   licenses,
   resolutionGroups,
   username,
+  challengeId,
 }: UploadZoneProps) {
   const t = useTranslations("upload");
   const router = useRouter();
@@ -306,6 +309,7 @@ export function UploadZone({
           tagNames,
           licenseId,
           selectedResolutionIds: selectedResIds ? [...selectedResIds] : null,
+          ...(challengeId ? { challengeId } : {}),
         }),
       });
 
@@ -329,7 +333,7 @@ export function UploadZone({
       const processRes = await fetch("/api/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallpaperId }),
+        body: JSON.stringify({ wallpaperId, ...(challengeId ? { challengeId } : {}) }),
       });
       if (!processRes.ok) throw new Error(await processRes.text());
 
@@ -343,7 +347,7 @@ export function UploadZone({
       setVariants([]);
       setError(err instanceof Error ? err.message : t("errorGeneric"));
     }
-  }, [canSubmit, categoryIds, description, file, getSelectedResolutions, licenseId, router, selectedResIds, t, tagNames, title]);
+  }, [canSubmit, categoryIds, challengeId, description, file, getSelectedResolutions, licenseId, router, selectedResIds, t, tagNames, title]);
 
   function onDrop(e: React.DragEvent) {
     e.preventDefault();
@@ -570,10 +574,12 @@ export function UploadZone({
                   {/* Description */}
                   <div className="rounded-[15px] p-4" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
                     <div className="text-xs font-semibold mb-2" style={{ color: "var(--muted)" }}>Description</div>
-                    <textarea value={description} onChange={(e) => setDescription(e.target.value)}
-                      rows={3} placeholder="Describe the scene, location, mood, camera details…"
-                      className="w-full rounded-[10px] px-[13px] py-[11px] text-sm outline-none resize-none transition-colors focus:border-[rgba(255,46,99,.5)]"
-                      style={{ background: "var(--surface2)", border: "1px solid var(--line2)", color: "var(--text)", lineHeight: "1.55" }} />
+                    <RichTextEditor
+                      content={description}
+                      onChange={setDescription}
+                      placeholder="Describe the scene, location, mood, camera details…"
+                      minHeight={140}
+                    />
                   </div>
 
                   {/* Visibility */}

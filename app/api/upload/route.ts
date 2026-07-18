@@ -21,6 +21,7 @@ const schema = z.object({
   categoryIds: z.array(z.number()).min(1),
   tagNames: z.array(z.string().trim().min(1)).optional().default([]),
   licenseId: z.number(),
+  challengeId: z.number().int().positive().optional(),
 });
 
 function slugifyTag(name: string) {
@@ -120,6 +121,7 @@ export async function POST(req: NextRequest) {
       wallpaperId: wallpaper.id,
       wallpaperUuid: wallpaper.uuid,
       key,
+      challengeId: body.challengeId ?? null,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Upload init failed";

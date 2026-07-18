@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { getTurnstileSiteKey, isTurnstileEnabled } from "@/lib/turnstile";
+import { RichTextEditor } from "@/components/rich-text-editor";
 
 const SUBJECT_KEYS = [
   "subjectGeneral",
@@ -175,15 +176,11 @@ export function ContactForm({
       </div>
 
       <Field label={t("message")}>
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          required
-          minLength={10}
-          maxLength={5000}
-          rows={6}
-          className="hd-field resize-y min-h-[140px]"
+        <RichTextEditor
+          content={message}
+          onChange={setMessage}
           placeholder={t("messagePlaceholder")}
+          minHeight={160}
         />
       </Field>
 

@@ -6,9 +6,6 @@ import { useMemo, useState } from "react";
 import { resolveMediaUrl } from "@/lib/media";
 import { wallpaperVariantUrl } from "@/lib/wallpaper-urls";
 import { formatCount } from "@/lib/format";
-import { AdminWallpaperEditModal } from "@/components/admin/admin-wallpaper-edit-modal";
-
-type Category = { id: number; name: string };
 
 type Row = {
   wallpaper: {
@@ -45,19 +42,16 @@ export function AdminWallpapersTable({
   items,
   totalCount,
   initialStatus = "",
-  categories,
 }: {
   items: Row[];
   totalCount: number;
   initialStatus?: string;
-  categories: Category[];
 }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<number[]>([]);
   const [statusFilter, setStatusFilter] = useState(initialStatus);
   const [sort, setSort] = useState("latest");
-  const [editId, setEditId] = useState<number | null>(null);
 
   const filtered = useMemo(() => {
     let list = items;
@@ -96,13 +90,6 @@ export function AdminWallpapersTable({
 
   return (
     <div>
-      {editId != null && (
-        <AdminWallpaperEditModal
-          wallpaperId={editId}
-          categories={categories}
-          onClose={() => setEditId(null)}
-        />
-      )}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <p className="text-[13px]" style={{ color: "var(--dim)" }}>{totalCount} total · manage library</p>
         <div className="relative">
@@ -190,15 +177,14 @@ export function AdminWallpapersTable({
               <div className="hidden md:block text-[13px] font-semibold" style={{ color: "var(--text3)" }}>{formatCount(row.downloadCount ?? 0)}</div>
               <div><span className="text-xs px-2 py-0.5 rounded capitalize font-semibold" style={{ background: st.bg, color: st.color }}>{row.wallpaper.status}</span></div>
               <div className="flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setEditId(row.wallpaper.id)}
+                <Link
+                  href={`/admin/wallpapers/${row.wallpaper.id}/edit`}
                   title="Edit wallpaper"
-                  className="w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer border-none text-[13px]"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer border-none text-[13px] no-underline"
                   style={{ background: "var(--surface2)", color: "var(--muted)" }}
                 >
                   ✎
-                </button>
+                </Link>
               </div>
             </div>
           );

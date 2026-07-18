@@ -1,6 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
+import { SiteLogo } from "./site-logo";
 import { db } from "@/lib/db";
 import { pages } from "@/lib/db/schema";
 import { eq, asc, and } from "drizzle-orm";
@@ -21,13 +21,7 @@ export async function Footer() {
       <div className="max-w-[1320px] mx-auto flex justify-between flex-wrap gap-8">
         <div className="max-w-[300px]">
           <div className="flex items-center gap-2.5 mb-3.5">
-            <Image
-              src="/assets/logo.png"
-              alt="HD Wallpapers"
-              width={120}
-              height={30}
-              className="site-logo h-[30px] w-auto"
-            />
+            <SiteLogo height={30} className="h-[30px] w-auto" />
           </div>
           <p className="text-[13px] leading-[1.6]" style={{ color: "var(--dim)" }}>
             {t("footerTagline")}

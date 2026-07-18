@@ -20,7 +20,7 @@ export const GEO_MAP: Record<string, Locale> = {
 };
 
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://hdwallpapers.site";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.hdwallpapers.site";
 
 export const CDN_URL =
   process.env.NEXT_PUBLIC_CDN_URL ??

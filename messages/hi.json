@@ -156,7 +156,10 @@
     "newPassword": "नया पासवर्ड",
     "confirmPassword": "नया पासवर्ड पुष्टि करें",
     "minPassword": "न्यूनतम 8 अक्षर",
-    "changePasswordBtn": "पासवर्ड बदलें"
+    "changePasswordBtn": "पासवर्ड बदलें",
+    "saved": "Settings saved",
+    "currentEmail": "Current email",
+    "passwordMismatch": "Passwords do not match"
   },
   "upload": {
     "pageTitle": "वॉलपेपर अपलोड करें",

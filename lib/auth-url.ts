@@ -10,6 +10,19 @@ export function getAuthBaseUrl(): string {
   );
 }
 
+function addWwwVariants(origin: string, origins: Set<string>) {
+  try {
+    const url = new URL(origin);
+    if (url.hostname.startsWith("www.")) {
+      origins.add(`${url.protocol}//${url.hostname.slice(4)}`);
+    } else if (!url.hostname.includes("localhost") && url.hostname.includes(".")) {
+      origins.add(`${url.protocol}//www.${url.hostname}`);
+    }
+  } catch {
+    // ignore invalid URLs
+  }
+}
+
 export function getTrustedOrigins(): string[] {
   const origins = new Set<string>();
   for (const value of [
@@ -17,7 +30,10 @@ export function getTrustedOrigins(): string[] {
     process.env.NEXT_PUBLIC_SITE_URL,
     process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
   ]) {
-    if (value) origins.add(value.replace(/\/$/, ""));
+    if (!value) continue;
+    const normalized = value.replace(/\/$/, "");
+    origins.add(normalized);
+    addWwwVariants(normalized, origins);
   }
   return [...origins];
 }

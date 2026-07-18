@@ -41,7 +41,13 @@ Admin panel: `/admin`
 
 1. Deploy to Vercel
 2. Set all env vars from `.env.example`
-3. Point `hdwallpapers.site` → Vercel
-4. Point `static.hdwallpapers.site` → Cloudflare R2 public bucket
-5. Run `pnpm db:push && pnpm seed` against production Neon DB
-6. Submit sitemap to Google Search Console
+3. **Production auth URLs** (both must match your canonical host):
+   ```
+   BETTER_AUTH_URL=https://www.hdwallpapers.site
+   NEXT_PUBLIC_SITE_URL=https://www.hdwallpapers.site
+   ```
+   Redeploy after setting `NEXT_PUBLIC_SITE_URL` (baked in at build time).
+4. Point `www.hdwallpapers.site` and `hdwallpapers.site` → Vercel (redirect apex → www if possible)
+5. Point `static.hdwallpapers.site` → Cloudflare R2 public bucket
+6. Run `pnpm db:push && pnpm seed` against production Neon DB
+7. Submit sitemap to Google Search Console

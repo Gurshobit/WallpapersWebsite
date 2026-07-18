@@ -7,6 +7,7 @@ import {
   countCollections,
   type CollectionSort,
 } from "@/lib/db/queries/collections";
+import { getUploadCategories } from "@/lib/db/queries/taxonomy";
 import { getCurrentUser } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -42,10 +43,11 @@ export default async function CollectionsPage({
   const q = sp.q ?? "";
   const user = await getCurrentUser();
 
-  const [featured, items, total] = await Promise.all([
+  const [featured, items, total, categories] = await Promise.all([
     listCollections({ featuredOnly: true, limit: 3, userId: user?.id }),
     listCollections({ filter, sort, q: q || undefined, userId: user?.id }),
     countCollections(filter, q || undefined),
+    getUploadCategories(),
   ]);
 
   return (
@@ -59,6 +61,7 @@ export default async function CollectionsPage({
         initialSort={sort}
         initialQ={q}
         isLoggedIn={Boolean(user)}
+        categories={categories.map((c) => c.name)}
       />
     </Suspense>
   );

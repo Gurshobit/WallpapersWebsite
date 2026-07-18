@@ -156,7 +156,10 @@
     "newPassword": "Nueva contraseña",
     "confirmPassword": "Confirmar nueva contraseña",
     "minPassword": "Mínimo 8 caracteres",
-    "changePasswordBtn": "Cambiar contraseña"
+    "changePasswordBtn": "Cambiar contraseña",
+    "saved": "Settings saved",
+    "currentEmail": "Current email",
+    "passwordMismatch": "Passwords do not match"
   },
   "upload": {
     "pageTitle": "Subir un fondo de pantalla",

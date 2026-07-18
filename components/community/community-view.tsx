@@ -7,6 +7,9 @@ import type { Challenge } from "@/lib/db/schema";
 import { collectionThumbSrc, formatRelativeTime } from "@/lib/collection-ui";
 import { formatCount } from "@/lib/format";
 import { resolveMediaUrl } from "@/lib/media";
+import { FollowButton } from "@/components/follow-button";
+import { RichContent } from "@/components/rich-content";
+import { stripHtml } from "@/lib/sanitize";
 
 type Creator = {
   id: number;
@@ -168,7 +171,7 @@ export function CommunityView({
             <SectionHeader title="Top Creators" subtitle="Ranked by total downloads" />
             <div className="flex flex-col gap-2">
               {creators.map((c, i) => (
-                <CreatorRow key={c.id} creator={c} rank={i + 1} prefix={prefix} large />
+                <CreatorRow key={c.id} creator={c} rank={i + 1} prefix={prefix} large isLoggedIn={isLoggedIn} />
               ))}
             </div>
           </div>
@@ -201,7 +204,7 @@ export function CommunityView({
                   </div>
                   <div className="p-4">
                     <div className="font-bold text-[15px] mb-1" style={{ fontFamily: "var(--font-heading)", color: "var(--text)" }}>{co.name}</div>
-                    <p className="text-xs line-clamp-2" style={{ color: "var(--text3)" }}>{co.description}</p>
+                    <p className="text-xs line-clamp-2" style={{ color: "var(--text3)" }}>{stripHtml(co.description)}</p>
                     <div className="text-[11px] mt-2" style={{ color: "var(--dim)" }}>{co.wallpaperCount} wallpapers · {co.curatorUsername}</div>
                   </div>
                 </Link>
@@ -333,20 +336,29 @@ function ChallengesSidebar({ challenges, onSeeAll }: { challenges: Challenge[]; 
   );
 }
 
-function CreatorRow({ creator, rank, prefix, large }: { creator: Creator; rank: number; prefix: string; large?: boolean }) {
+function CreatorRow({ creator, rank, prefix, large, isLoggedIn }: { creator: Creator; rank: number; prefix: string; large?: boolean; isLoggedIn?: boolean }) {
   return (
-    <Link href={`${prefix}/u/${creator.username}`} className="flex items-center gap-4 rounded-2xl border px-5 py-4 no-underline transition-colors hover:border-[var(--line2)]" style={{ background: "var(--surface)", borderColor: "var(--line)" }}>
-      <span className="w-9 text-center font-bold text-base" style={{ color: rank <= 3 ? "#f5c518" : "var(--dim)" }}>{rank}</span>
-      <div className={`rounded-full bg-cover bg-center border-[3px] flex-none ${large ? "w-[52px] h-[52px]" : "w-9 h-9"}`} style={{ ...avatarStyle(creator.avatarUrl), borderColor: "var(--line)" }} />
-      <div className="flex-1 min-w-0">
-        <div className={`font-bold ${large ? "text-base" : "text-sm"}`} style={{ color: "var(--text)" }}>{creator.nickname ?? creator.username}</div>
-        <div className="text-[13px]" style={{ color: "var(--dim)" }}>@{creator.username}</div>
-      </div>
-      <div className="hidden sm:flex gap-6 text-center flex-none">
-        <div><div className="font-bold text-[17px]" style={{ fontFamily: "var(--font-heading)" }}>{creator.totalUploads}</div><div className="text-[11px]" style={{ color: "var(--dim)" }}>Uploads</div></div>
-        <div><div className="font-bold text-[17px]" style={{ fontFamily: "var(--font-heading)", color: "#22d3ee" }}>{formatCount(creator.totalDownloads)}</div><div className="text-[11px]" style={{ color: "var(--dim)" }}>Downloads</div></div>
-      </div>
-    </Link>
+    <div className="flex items-center gap-4 rounded-2xl border px-5 py-4" style={{ background: "var(--surface)", borderColor: "var(--line)" }}>
+      <Link href={`${prefix}/u/${creator.username}`} className="flex items-center gap-4 flex-1 min-w-0 no-underline">
+        <span className="w-9 text-center font-bold text-base" style={{ color: rank <= 3 ? "#f5c518" : "var(--dim)" }}>{rank}</span>
+        <div className={`rounded-full bg-cover bg-center border-[3px] flex-none ${large ? "w-[52px] h-[52px]" : "w-9 h-9"}`} style={{ ...avatarStyle(creator.avatarUrl), borderColor: "var(--line)" }} />
+        <div className="flex-1 min-w-0">
+          <div className={`font-bold ${large ? "text-base" : "text-sm"}`} style={{ color: "var(--text)" }}>{creator.nickname ?? creator.username}</div>
+          <div className="text-[13px]" style={{ color: "var(--dim)" }}>@{creator.username}</div>
+        </div>
+        <div className="hidden sm:flex gap-6 text-center flex-none">
+          <div><div className="font-bold text-[17px]" style={{ fontFamily: "var(--font-heading)" }}>{creator.totalUploads}</div><div className="text-[11px]" style={{ color: "var(--dim)" }}>Uploads</div></div>
+          <div><div className="font-bold text-[17px]" style={{ fontFamily: "var(--font-heading)", color: "#22d3ee" }}>{formatCount(creator.totalDownloads)}</div><div className="text-[11px]" style={{ color: "var(--dim)" }}>Downloads</div></div>
+        </div>
+      </Link>
+      <FollowButton
+        handle={creator.username}
+        initialFollowing={false}
+        isLoggedIn={Boolean(isLoggedIn)}
+        isOwnProfile={false}
+        loginHref={`${prefix}/login`}
+      />
+    </div>
   );
 }
 
@@ -361,7 +373,7 @@ function ChallengeCard({ challenge, prefix, canSubmit }: { challenge: Challenge;
             {active ? "Active" : "Ended"}
           </span>
         </div>
-        <p className="text-[13.5px] leading-relaxed mb-4" style={{ color: "var(--text3)" }}>{challenge.description}</p>
+        <RichContent html={challenge.description} className="rte-prose rte-prose-sm mb-4" />
       </div>
       <div className="px-5 py-4 border-t flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: "var(--line)" }}>
         <div className="text-xs" style={{ color: "var(--dim)" }}>
@@ -370,7 +382,7 @@ function ChallengeCard({ challenge, prefix, canSubmit }: { challenge: Challenge;
           {challenge.prize && <div className="mt-1 font-semibold" style={{ color: "var(--text3)" }}>🏆 {challenge.prize}</div>}
         </div>
         {canSubmit && active && (
-          <Link href={`${prefix}/upload`} className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-white no-underline whitespace-nowrap" style={{ background: "linear-gradient(135deg,#ff2e63,#ff6a3d)" }}>
+          <Link href={`${prefix}/upload?challenge=${challenge.id}`} className="rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-white no-underline whitespace-nowrap" style={{ background: "linear-gradient(135deg,#ff2e63,#ff6a3d)" }}>
             Enter now →
           </Link>
         )}

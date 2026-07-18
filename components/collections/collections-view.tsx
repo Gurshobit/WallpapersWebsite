@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { CollectionListItem, CollectionSort } from "@/lib/db/queries/collections";
-import { COLLECTION_FILTERS } from "@/lib/db/queries/collections";
 import { collectionThumbSrc } from "@/lib/collection-ui";
 import { formatCount } from "@/lib/format";
+import { stripHtml } from "@/lib/sanitize";
+import { CreateCollectionButton } from "./create-collection-button";
 
 export function CollectionsView({
   prefix,
@@ -17,6 +18,7 @@ export function CollectionsView({
   initialSort,
   initialQ,
   isLoggedIn,
+  categories,
 }: {
   prefix: string;
   featured: CollectionListItem[];
@@ -26,7 +28,9 @@ export function CollectionsView({
   initialSort: CollectionSort;
   initialQ: string;
   isLoggedIn: boolean;
+  categories: string[];
 }) {
+  const filterOptions = ["All", ...categories];
   const router = useRouter();
   const searchParams = useSearchParams();
   const [pending, startTransition] = useTransition();
@@ -123,6 +127,14 @@ export function CollectionsView({
           <p className="text-sm text-white/55 max-w-[480px] leading-relaxed">
             Curated sets of the finest wallpapers — handpicked by creators and community members.
           </p>
+          <div className="mt-3">
+            <CreateCollectionButton
+              isLoggedIn={isLoggedIn}
+              loginHref={`${prefix}/login`}
+              prefix={prefix}
+              categories={categories}
+            />
+          </div>
         </div>
       </div>
 
@@ -168,7 +180,7 @@ export function CollectionsView({
         {/* Filters */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div className="flex flex-wrap gap-2">
-            {COLLECTION_FILTERS.map((f) => {
+            {filterOptions.map((f) => {
               const active = filter === f;
               return (
                 <button
@@ -273,7 +285,7 @@ function CollectionCard({
               {col.name}
             </Link>
             {col.description && (
-              <p className="text-[12.5px] mt-1 line-clamp-2 leading-relaxed" style={{ color: "var(--text3)" }}>{col.description}</p>
+              <p className="text-[12.5px] mt-1 line-clamp-2 leading-relaxed" style={{ color: "var(--text3)" }}>{stripHtml(col.description)}</p>
             )}
           </div>
           <button

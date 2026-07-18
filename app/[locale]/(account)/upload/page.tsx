@@ -15,10 +15,13 @@ export const dynamic = "force-dynamic";
 
 export default async function UploadPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ challenge?: string }>;
 }) {
   const { locale } = await params;
+  const sp = await searchParams;
   setRequestLocale(locale);
   const prefix = locale === "en" ? "" : `/${locale}`;
 
@@ -39,6 +42,8 @@ export default async function UploadPage({
     getUploadResolutionGroups(),
   ]);
 
+  const challengeId = sp.challenge ? parseInt(sp.challenge, 10) : undefined;
+
   return (
     <UploadZone
       categories={categories}
@@ -46,6 +51,7 @@ export default async function UploadPage({
       licenses={licenses}
       resolutionGroups={resolutionGroups}
       username={user.username}
+      challengeId={Number.isFinite(challengeId) ? challengeId : undefined}
     />
   );
 }

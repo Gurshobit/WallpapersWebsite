@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { authClient, signIn } from "@/lib/auth-client";
 import Link from "next/link";
-import Image from "next/image";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+import { SiteLogo } from "./site-logo";
 import { getTurnstileSiteKey, isTurnstileEnabled } from "@/lib/turnstile";
 
 type Tab = "login" | "signup";
@@ -115,14 +115,7 @@ export function AuthForm({
 
       <div className="w-full max-w-[440px] relative">
         <Link href={prefix || "/"} className="flex justify-center mb-[30px]">
-          <Image
-            src="/assets/logo.png"
-            alt="HD Wallpapers"
-            width={176}
-            height={44}
-            className="site-logo h-11 w-auto"
-            priority
-          />
+          <SiteLogo height={44} className="h-11 w-auto" priority />
         </Link>
 
         <div
