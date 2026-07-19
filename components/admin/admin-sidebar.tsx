@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { SiteLogo } from "../site-logo";
 import { AdminNavIcon, IconArrowLeft, type AdminNavIconKey } from "./admin-icons";
 import { AdminAppearanceToggle } from "./admin-appearance-toggle";
@@ -37,14 +38,17 @@ interface AdminSidebarProps {
   pendingCount?: number;
 }
 
-export function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
-  const pathname = usePathname();
-
+function SidebarInner({
+  pendingCount,
+  pathname,
+  onNavigate,
+}: {
+  pendingCount: number;
+  pathname: string;
+  onNavigate?: () => void;
+}) {
   return (
-    <aside
-      className="w-[236px] flex-none sticky top-0 h-screen flex flex-col py-[18px] px-[14px] border-r"
-      style={{ background: "var(--bg2)", borderColor: "var(--line)" }}
-    >
+    <>
       <div className="flex items-center gap-2.5 px-2 pb-5">
         <div className="flex flex-col gap-0.5">
           <SiteLogo height={28} className="h-7 w-auto" priority />
@@ -64,6 +68,7 @@ export function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
             <Link
               key={href}
               href={href}
+              onClick={onNavigate}
               className="flex items-center gap-[11px] px-[13px] py-2.5 rounded-[10px] text-[13.5px] font-semibold transition-colors no-underline"
               style={
                 active
@@ -102,12 +107,99 @@ export function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
 
       <Link
         href="/"
+        onClick={onNavigate}
         className="flex items-center gap-2 px-[13px] py-2.5 rounded-[10px] text-[13.5px] font-semibold no-underline border-t mt-2 transition-colors hover:text-[var(--text)]"
         style={{ color: "var(--muted)", borderColor: "var(--line)" }}
       >
         <IconArrowLeft />
         Back to site
       </Link>
-    </aside>
+    </>
+  );
+}
+
+export function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  // Close the drawer whenever the route changes.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll while the mobile drawer is open.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  return (
+    <>
+      {/* Desktop rail */}
+      <aside
+        className="hidden md:flex w-[200px] lg:w-[236px] flex-none sticky top-0 h-screen flex-col py-[18px] px-[14px] border-r"
+        style={{ background: "var(--bg2)", borderColor: "var(--line)" }}
+      >
+        <SidebarInner pendingCount={pendingCount} pathname={pathname} />
+      </aside>
+
+      {/* Mobile top bar */}
+      <div
+        className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center gap-3 px-4 border-b"
+        style={{ background: "var(--bg2)", borderColor: "var(--line)" }}
+      >
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Open admin menu"
+          className="w-9 h-9 -ml-1 rounded-[9px] flex items-center justify-center flex-none cursor-pointer"
+          style={{ color: "var(--text)", background: "var(--surface2)" }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+        <SiteLogo height={24} className="h-6 w-auto" />
+        <span className="text-[11px] font-semibold" style={{ color: "var(--dim2)" }}>
+          Admin
+        </span>
+      </div>
+
+      {/* Mobile drawer */}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50">
+          <div
+            className="absolute inset-0"
+            style={{ background: "rgba(0,0,0,.5)" }}
+            onClick={() => setOpen(false)}
+          />
+          <aside
+            className="absolute top-0 left-0 h-full w-[264px] max-w-[85vw] flex flex-col py-[18px] px-[14px] border-r overflow-y-auto"
+            style={{ background: "var(--bg2)", borderColor: "var(--line)", animation: "slideInLeft .25s ease both" }}
+          >
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close admin menu"
+              className="absolute top-3 right-3 w-8 h-8 rounded-[9px] flex items-center justify-center cursor-pointer"
+              style={{ color: "var(--muted)", background: "var(--surface2)" }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
+            <SidebarInner
+              pendingCount={pendingCount}
+              pathname={pathname}
+              onNavigate={() => setOpen(false)}
+            />
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

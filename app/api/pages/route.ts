@@ -3,6 +3,8 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { pages } from "@/lib/db/schema";
 import { asc } from "drizzle-orm";
+import { requireAdmin } from "@/lib/session";
+import { jsonError } from "@/lib/api-response";
 
 const schema = z.object({
   title: z.string().min(1).max(500),
@@ -25,10 +27,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    await requireAdmin();
     const body = schema.parse(await req.json());
     const [row] = await db.insert(pages).values(body).returning();
     return NextResponse.json(row, { status: 201 });
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 400 });
+    return jsonError(err);
   }
 }

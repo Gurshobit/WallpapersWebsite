@@ -74,7 +74,7 @@ export function ShortlistGrid({ items }: { items: ShortlistItem[] }) {
   }
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(252px,1fr))] gap-[18px]">
+    <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(252px,1fr))] gap-3 sm:gap-[18px]">
       {items.map((w) => {
         const author = w.authorName ?? w.username ?? "Unknown";
         const detailHref = `${prefix}/wallpapers/${w.slug}`;

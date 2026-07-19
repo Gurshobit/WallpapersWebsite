@@ -9,12 +9,15 @@ import {
 } from "@/lib/db/schema";
 import { getObjectBuffer } from "@/lib/r2";
 import { processWallpaperVariants, ALL_VARIANTS } from "@/lib/sharp";
+import { requireAuth } from "@/lib/session";
+import { jsonError } from "@/lib/api-response";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await requireAuth();
     const { wallpaperId, challengeId } = await req.json();
     if (!wallpaperId) {
       return NextResponse.json({ error: "wallpaperId required" }, { status: 400 });
@@ -28,6 +31,11 @@ export async function POST(req: NextRequest) {
 
     if (!wallpaper?.originalKey) {
       return NextResponse.json({ error: "Wallpaper not found" }, { status: 404 });
+    }
+
+    // Only the uploader (or an admin) may trigger processing for a wallpaper.
+    if (wallpaper.userId !== user.id && user.roleId !== 1) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const buffer = await getObjectBuffer(wallpaper.originalKey);
@@ -99,9 +107,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, status });
   } catch (err) {
     console.error("Process error:", err);
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Processing failed" },
-      { status: 500 }
-    );
+    return jsonError(err, 500);
   }
 }

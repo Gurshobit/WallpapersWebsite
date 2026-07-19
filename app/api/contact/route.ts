@@ -4,6 +4,7 @@ import { verifyTurnstileToken } from "@/lib/turnstile";
 import { getContactEmail } from "@/lib/contact";
 import { sendContactEmail } from "@/lib/email";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { getCurrentUser } from "@/lib/session";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -30,12 +31,18 @@ export async function POST(req: NextRequest) {
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       "";
 
-    const turnstile = await verifyTurnstileToken(
-      parsed.data.turnstileToken,
-      ip
-    );
-    if (!turnstile.ok) {
-      return NextResponse.json({ error: turnstile.error }, { status: 403 });
+    // Authenticated clients (e.g. the mobile app sending a Bearer token) are
+    // already trusted, so they may skip the Turnstile captcha. Anonymous web
+    // visitors still require a valid token in production.
+    const authedUser = await getCurrentUser().catch(() => null);
+    if (!authedUser) {
+      const turnstile = await verifyTurnstileToken(
+        parsed.data.turnstileToken,
+        ip
+      );
+      if (!turnstile.ok) {
+        return NextResponse.json({ error: turnstile.error }, { status: 403 });
+      }
     }
 
     const to = await getContactEmail();

@@ -126,8 +126,8 @@ export function AdminUsersTable({
         ))}
       </div>
 
-      <div className="rounded-[15px] border overflow-hidden" style={{ borderColor: "var(--line)", background: "var(--surface)" }}>
-        <div className="hidden md:grid grid-cols-[2.4fr_1fr_1fr_1fr_1.2fr_1.2fr] gap-3.5 px-[18px] py-3 text-[11.5px] font-bold uppercase tracking-wide border-b" style={{ borderColor: "var(--line)", color: "var(--dim2)" }}>
+      <div className="rounded-[15px] border overflow-x-auto" style={{ borderColor: "var(--line)", background: "var(--surface)" }}>
+        <div className="hidden md:grid md:min-w-[720px] grid-cols-[2.4fr_1fr_1fr_1fr_1.2fr_1.2fr] gap-3.5 px-[18px] py-3 text-[11.5px] font-bold uppercase tracking-wide border-b" style={{ borderColor: "var(--line)", color: "var(--dim2)" }}>
           <span>User</span><span>Role</span><span>Uploads</span><span>Downloads</span><span>Status</span><span>Change status</span>
         </div>
         {filtered.map(({ user, nickname }) => {
@@ -135,7 +135,7 @@ export function AdminUsersTable({
           const st = STATUS_STYLE[user.status] ?? STATUS_STYLE.pending;
           const busy = savingId === user.id;
           return (
-            <div key={user.id} className="grid grid-cols-1 md:grid-cols-[2.4fr_1fr_1fr_1fr_1.2fr_1.2fr] gap-3.5 px-[18px] py-3 border-b items-center hover:bg-[var(--surface2)]" style={{ borderColor: "var(--line)" }}>
+            <div key={user.id} className="grid grid-cols-1 md:grid-cols-[2.4fr_1fr_1fr_1fr_1.2fr_1.2fr] md:min-w-[720px] gap-3.5 px-[18px] py-3 border-b items-center hover:bg-[var(--surface2)]" style={{ borderColor: "var(--line)" }}>
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-9 h-9 rounded-full bg-cover bg-center border-2 flex-none" style={{ borderColor: "var(--line)", backgroundColor: "var(--surface2)", backgroundImage: user.avatarUrl ? `url(${resolveMediaUrl(user.avatarUrl)})` : undefined }} />
                 <div className="min-w-0">
@@ -145,7 +145,8 @@ export function AdminUsersTable({
                   <div className="text-xs truncate" style={{ color: "var(--dim)" }}>@{user.username}{user.email ? ` · ${user.email}` : ""}</div>
                 </div>
               </div>
-              <div>
+              <div className="flex items-center justify-between gap-2 md:block">
+                <span className="md:hidden text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--dim2)" }}>Role</span>
                 <select
                   value={user.roleId}
                   disabled={busy}
@@ -158,20 +159,28 @@ export function AdminUsersTable({
                   ))}
                 </select>
               </div>
-              <div className="text-[13.5px] font-semibold">{user.totalUploads}</div>
-              <div className="text-[13.5px] font-semibold" style={{ color: "var(--text3)" }}>{formatCount(user.totalDownloads)}</div>
-              <div>
+              <div className="flex items-center justify-between gap-2 md:block text-[13.5px] font-semibold">
+                <span className="md:hidden text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--dim2)" }}>Uploads</span>
+                {user.totalUploads}
+              </div>
+              <div className="flex items-center justify-between gap-2 md:block text-[13.5px] font-semibold" style={{ color: "var(--text3)" }}>
+                <span className="md:hidden text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--dim2)" }}>Downloads</span>
+                {formatCount(user.totalDownloads)}
+              </div>
+              <div className="flex items-center justify-between gap-2 md:block">
+                <span className="md:hidden text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--dim2)" }}>Status</span>
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-0.5 rounded capitalize" style={{ background: st.bg, color: st.color }}>
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: st.dot }} />
                   {user.status}
                 </span>
               </div>
-              <div>
+              <div className="flex items-center justify-between gap-2 md:block">
+                <span className="md:hidden text-[11px] font-bold uppercase tracking-wide flex-none" style={{ color: "var(--dim2)" }}>Change status</span>
                 <select
                   value={user.status}
                   disabled={busy}
                   onChange={(e) => void patchUser(user.id, { status: e.target.value })}
-                  className="w-full hd-field py-1.5 text-xs capitalize"
+                  className="w-full max-w-[180px] md:max-w-none hd-field py-1.5 text-xs capitalize"
                   style={{ cursor: busy ? "wait" : "pointer", opacity: busy ? 0.6 : 1 }}
                 >
                   {STATUS_OPTIONS.map((s) => (

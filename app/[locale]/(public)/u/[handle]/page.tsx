@@ -62,7 +62,7 @@ export default async function ProfilePage({
 
   if (privacy?.viewWallpapers === "only_me" && !isOwner) {
     return (
-      <div className="px-7 py-16 text-center" style={{ color: "var(--dim)" }}>
+      <div className="px-4 sm:px-7 py-16 text-center" style={{ color: "var(--dim)" }}>
         This profile is private.
       </div>
     );
@@ -104,7 +104,7 @@ export default async function ProfilePage({
 
   return (
     <div style={{ animation: "fadeUp .4s ease both" }}>
-      <div className="relative h-[240px] max-w-[1320px] mx-auto px-7">
+      <div className="relative h-[240px] max-w-[1320px] mx-auto px-4 sm:px-7">
         <div
           className="relative h-full rounded-b-[20px] overflow-hidden border border-t-0"
           style={{ borderColor: "var(--line)" }}
@@ -152,7 +152,7 @@ export default async function ProfilePage({
         </div>
       </div>
 
-      <div className="max-w-[1320px] mx-auto px-7 pb-[50px]">
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-7 pb-[50px]">
         <div className="flex items-end gap-5 -mt-[54px] relative px-2 flex-wrap">
           {user.avatarUrl ? (
             <div

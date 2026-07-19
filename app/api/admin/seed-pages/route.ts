@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { pages } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { requireAdmin } from "@/lib/session";
+import { jsonError } from "@/lib/api-response";
 
 const PAGES = [
   {
@@ -102,6 +104,7 @@ const PAGES = [
 export async function POST() {
   const results: string[] = [];
   try {
+    await requireAdmin();
     for (const page of PAGES) {
       const existing = await db
         .select({ id: pages.id })
@@ -125,6 +128,6 @@ export async function POST() {
     }
     return NextResponse.json({ ok: true, results });
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return jsonError(err, 500);
   }
 }

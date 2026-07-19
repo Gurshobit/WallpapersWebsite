@@ -382,7 +382,7 @@ export function UploadZone({
       </div>
 
       {/* Two-column layout */}
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
+      <div className="flex flex-col md:flex-row gap-6 items-start">
 
         {/* ── LEFT COLUMN ── */}
         <div className="flex-1 min-w-0 flex flex-col gap-5">
@@ -710,7 +710,7 @@ export function UploadZone({
         </div>
 
         {/* ── RIGHT COLUMN — Details form ── */}
-        <aside className="w-full lg:w-[380px] flex-none rounded-[15px] p-[18px] flex flex-col gap-[15px] lg:sticky lg:top-[84px]"
+        <aside className="w-full md:w-[340px] lg:w-[380px] flex-none rounded-[15px] p-[18px] flex flex-col gap-[15px] md:sticky md:top-[84px]"
           style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
           <div className="font-bold text-[15.5px]" style={{ fontFamily: "var(--font-heading)" }}>
             {t("detailsTitle")}

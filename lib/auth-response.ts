@@ -28,5 +28,11 @@ export async function forwardAuthResponse(res: Response): Promise<NextResponse> 
     if (cookie) nextRes.headers.append("set-cookie", cookie);
   }
 
+  // Forward the bearer token issued by the better-auth bearer plugin so native
+  // clients (which don't use cookies) can read and replay it as
+  // `Authorization: Bearer <token>`. Harmless for the cookie-based web flow.
+  const authToken = res.headers.get("set-auth-token");
+  if (authToken) nextRes.headers.set("set-auth-token", authToken);
+
   return nextRes;
 }

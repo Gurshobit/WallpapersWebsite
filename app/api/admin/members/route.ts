@@ -18,6 +18,7 @@ import {
   getMemberSettings,
   isUsernameRestricted,
 } from "@/lib/member-settings";
+import { jsonError } from "@/lib/api-response";
 
 const schema = z.object({
   username: z.string().min(3).max(100).regex(/^[a-zA-Z0-9_]+$/),
@@ -93,6 +94,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, userId: user.id }, { status: 201 });
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 400 });
+    return jsonError(err);
   }
 }

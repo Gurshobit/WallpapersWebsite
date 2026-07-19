@@ -106,7 +106,7 @@ export function AuthForm({
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-10 relative overflow-y-auto">
       <div
-        className="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[900px] h-[500px] pointer-events-none"
+        className="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[min(900px,100vw)] h-[500px] pointer-events-none"
         style={{
           background:
             "radial-gradient(ellipse, rgba(255,46,99,.18) 0%, transparent 70%)",

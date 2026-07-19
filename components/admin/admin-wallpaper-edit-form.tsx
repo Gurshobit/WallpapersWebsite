@@ -120,7 +120,7 @@ export function AdminWallpaperEditForm({
   }
 
   return (
-    <div className="grid lg:grid-cols-[1.3fr_1fr] gap-6 items-start">
+    <div className="grid md:grid-cols-[1.3fr_1fr] gap-6 items-start">
       {/* Left: preview + variants */}
       <div className="flex flex-col gap-5">
         <div
@@ -206,7 +206,7 @@ export function AdminWallpaperEditForm({
 
       {/* Right: edit form (sticky) */}
       <div
-        className="rounded-[14px] border p-5 flex flex-col gap-4 lg:sticky lg:top-6"
+        className="rounded-[14px] border p-5 flex flex-col gap-4 md:sticky md:top-6"
         style={{ borderColor: "var(--line)", background: "var(--surface)" }}
       >
         <Field label="Title">

@@ -81,22 +81,23 @@ export function Header({
     <>
       {/* Sticky wrapper for both header rows — keeps z-50 stacking context over hero */}
       <div className="hd-header glass-header sticky top-0 z-50">
-        <header className="flex items-center gap-4 px-5 sm:px-7 py-3">
+        <header className="flex items-center gap-2.5 lg:gap-4 px-5 sm:px-7 py-3">
 
           {/* Logo */}
           <Link href={prefix || "/"} className="flex items-center flex-none">
             <SiteLogo height={36} className="h-[32px] sm:h-[36px] w-auto" priority />
           </Link>
 
-          {/* Desktop nav */}
+          {/* Desktop nav — icon-only in the md-lg range to save room, labels return at lg */}
           <nav className="hd-header-nav hidden md:flex items-center gap-1 flex-none">
             {nav.map((item) => (
               <Link key={item.href} href={item.href}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[9px] text-sm font-semibold transition-colors no-underline"
+                title={item.label}
+                className="inline-flex items-center gap-1.5 px-2.5 lg:px-3.5 py-2 rounded-[9px] text-sm font-semibold transition-colors no-underline"
                 style={item.active ? { color: "var(--text)", background: "var(--line)" } : { color: "var(--muted)" }}
               >
                 <NavIcon d={item.icon} />
-                {item.label}
+                <span className="hidden lg:inline">{item.label}</span>
               </Link>
             ))}
           </nav>
@@ -106,14 +107,29 @@ export function Header({
             <HeaderSearch />
           </div>
 
+          {/* Tablet filters trigger — sidebar is hidden below lg, so surface the drawer here */}
+          {showFilterBtn && (
+            <button
+              type="button"
+              aria-label="Open filters"
+              onClick={() => window.dispatchEvent(new CustomEvent("hd:open-filters"))}
+              className="hidden sm:flex lg:hidden flex-none w-9 h-9 items-center justify-center rounded-[10px] transition-colors hover:bg-[var(--surface2)]"
+              style={{ background: "var(--surface)", border: "1px solid var(--line2)", color: "var(--text)" }}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                <path d="M3 6h18M7 12h10M11 18h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
+
           {/* Desktop right actions */}
-          <div className="hidden md:flex items-center gap-2.5 flex-none">
-            <Link href={canSubmit ? `${prefix}/upload` : `${prefix}/community`} className="hd-header-upload-btn hd-btn-primary text-sm px-3 py-2">
+          <div className="hidden md:flex items-center gap-2 lg:gap-2.5 flex-none">
+            <Link href={canSubmit ? `${prefix}/upload` : `${prefix}/community`} title={t("upload")} className="hd-header-upload-btn hd-btn-primary text-sm px-3 py-2">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
                 <path d="M12 16V4m0 0 5 5m-5-5L7 9" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
               </svg>
-              <span>{t("upload")}</span>
+              <span className="hidden lg:inline">{t("upload")}</span>
             </Link>
             <LocaleSwitcher locale={locale} />
             <ThemeToggle />

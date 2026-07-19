@@ -8,6 +8,9 @@
 }
 
 :root {
+  /* Sticky header height, consumed by sticky sub-navs (e.g. community tabs).
+     Mobile shows a second search row, so the offset is taller below sm. */
+  --header-offset: 64px;
   --bg: #0a0a0c;
   --bg2: #0e0e10;
   --surface: #141417;
@@ -126,6 +129,22 @@ img.site-logo-light {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile header is taller (adds a search row), so bump the sticky offset. */
+@media (max-width: 639px) {
+  :root {
+    --header-offset: 116px;
   }
 }
 
@@ -304,10 +323,17 @@ img.site-logo-light {
   }
   .hd-hero {
     height: 320px !important;
-    margin: 14px !important;
   }
   .hd-hero h1 {
     font-size: 28px !important;
+  }
+}
+
+/* Tablet tier: bridge the 160px<->252px card floor so 769-1024 doesn't dip to 2 oversized columns */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hd-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 14px !important;
   }
 }
 

@@ -152,7 +152,7 @@ export function CommunityView({
 
       <div className="max-w-[1320px] mx-auto px-5 sm:px-7 pt-7">
         {tab === "feed" && (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_320px] gap-6 items-start">
             <div className="flex flex-col gap-3">
               {feed.map((item) => (
                 <FeedCard key={item.id} item={item} prefix={prefix} />
@@ -180,7 +180,7 @@ export function CommunityView({
         {tab === "challenges" && (
           <div>
             <SectionHeader title="Monthly Challenges" subtitle="Upload wallpapers matching the theme to enter" />
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {challenges.map((ch) => (
                 <ChallengeCard key={ch.id} challenge={ch} prefix={prefix} canSubmit={canSubmit} />
               ))}
@@ -194,7 +194,7 @@ export function CommunityView({
               <SectionHeader title="Featured Collections" subtitle="Curated sets by the community's top creators" inline />
               <Link href={`${prefix}/collections`} className="text-sm font-bold no-underline" style={{ color: "#ff6a8a" }}>View all →</Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {featuredCollections.map((co) => (
                 <Link key={co.id} href={`${prefix}/collections/${co.slug}`} className="rounded-[18px] overflow-hidden border no-underline transition-transform hover:-translate-y-1" style={{ background: "var(--surface)", borderColor: "var(--line)" }}>
                   <div className="grid grid-cols-[2fr_1fr] grid-rows-2 h-40 gap-0.5">

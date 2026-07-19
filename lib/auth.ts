@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { bearer } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "./db";
 import {
@@ -63,7 +64,10 @@ export const auth = betterAuth({
   advanced: {
     useSecureCookies: shouldUseSecureCookies(),
   },
-  plugins: [nextCookies()],
+  // bearer() lets native/mobile clients authenticate with an
+  // `Authorization: Bearer <token>` header (no client SDK required) while web
+  // keeps using cookie sessions. nextCookies() must stay last.
+  plugins: [bearer(), nextCookies()],
 });
 
 export type Session = typeof auth.$Infer.Session;

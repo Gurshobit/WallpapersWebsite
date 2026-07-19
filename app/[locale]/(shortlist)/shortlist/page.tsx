@@ -28,7 +28,7 @@ export default async function ShortlistPage({
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       <div
-        className="flex items-center gap-4 px-7 py-[18px] border-b"
+        className="flex items-center gap-4 px-4 sm:px-7 py-[18px] border-b"
         style={{ borderColor: "var(--line)" }}
       >
         <Link
@@ -60,7 +60,7 @@ export default async function ShortlistPage({
         </h1>
       </div>
 
-      <div className="max-w-[1320px] mx-auto p-7">
+      <div className="max-w-[1320px] mx-auto p-4 sm:p-7">
         <ShortlistGrid items={result.items} />
       </div>
     </div>

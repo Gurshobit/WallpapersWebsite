@@ -143,8 +143,8 @@ export function AdminWallpapersTable({
         </div>
       )}
 
-      <div className="rounded-[15px] border overflow-hidden" style={{ borderColor: "var(--line)", background: "var(--surface)" }}>
-        <div className="hidden md:grid grid-cols-[28px_56px_1.8fr_1fr_1fr_1fr_80px_40px] gap-3 px-4 py-3 text-[11.5px] font-bold uppercase tracking-wide border-b" style={{ borderColor: "var(--line)", color: "var(--dim2)" }}>
+      <div className="rounded-[15px] border overflow-x-auto" style={{ borderColor: "var(--line)", background: "var(--surface)" }}>
+        <div className="hidden md:grid md:min-w-[760px] grid-cols-[28px_56px_1.8fr_1fr_1fr_1fr_80px_40px] gap-3 px-4 py-3 text-[11.5px] font-bold uppercase tracking-wide border-b" style={{ borderColor: "var(--line)", color: "var(--dim2)" }}>
           <button type="button" onClick={() => setSelected(allSelected ? [] : filtered.map((r) => r.wallpaper.id))} className="cursor-pointer border-none bg-transparent p-0">☐</button>
           <span />
           <span>Title</span>
@@ -158,7 +158,7 @@ export function AdminWallpapersTable({
           const st = STATUS_STYLE[row.wallpaper.status] ?? STATUS_STYLE.draft;
           const isSelected = selected.includes(row.wallpaper.id);
           return (
-            <div key={row.wallpaper.id} className="grid grid-cols-1 md:grid-cols-[28px_56px_1.8fr_1fr_1fr_1fr_80px_40px] gap-3 px-4 py-3 border-b items-center hover:bg-[var(--surface2)]" style={{ borderColor: "var(--line)" }}>
+            <div key={row.wallpaper.id} className="grid grid-cols-1 md:grid-cols-[28px_56px_1.8fr_1fr_1fr_1fr_80px_40px] md:min-w-[760px] gap-3 px-4 py-3 border-b items-center hover:bg-[var(--surface2)]" style={{ borderColor: "var(--line)" }}>
               <button type="button" onClick={() => setSelected((s) => isSelected ? s.filter((id) => id !== row.wallpaper.id) : [...s, row.wallpaper.id])} className="w-5 h-5 rounded border flex items-center justify-center cursor-pointer" style={{ borderColor: isSelected ? "#ff2e63" : "var(--line2)", background: isSelected ? "#ff2e63" : "transparent", color: "#fff" }}>
                 {isSelected ? "✓" : ""}
               </button>
@@ -174,8 +174,14 @@ export function AdminWallpapersTable({
                 <div className="w-[22px] h-[22px] rounded-full bg-cover bg-center flex-none" style={{ backgroundImage: row.avatarUrl ? `url(${resolveMediaUrl(row.avatarUrl)})` : undefined, backgroundColor: "var(--surface2)" }} />
                 <span className="text-[12.5px] truncate" style={{ color: "var(--text3)" }}>{row.username}</span>
               </div>
-              <div className="hidden md:block text-[13px] font-semibold" style={{ color: "var(--text3)" }}>{formatCount(row.downloadCount ?? 0)}</div>
-              <div><span className="text-xs px-2 py-0.5 rounded capitalize font-semibold" style={{ background: st.bg, color: st.color }}>{row.wallpaper.status}</span></div>
+              <div className="flex items-center justify-between gap-2 md:block text-[13px] font-semibold" style={{ color: "var(--text3)" }}>
+                <span className="md:hidden text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--dim2)" }}>Downloads</span>
+                {formatCount(row.downloadCount ?? 0)}
+              </div>
+              <div className="flex items-center justify-between gap-2 md:block">
+                <span className="md:hidden text-[11px] font-bold uppercase tracking-wide" style={{ color: "var(--dim2)" }}>Status</span>
+                <span className="text-xs px-2 py-0.5 rounded capitalize font-semibold" style={{ background: st.bg, color: st.color }}>{row.wallpaper.status}</span>
+              </div>
               <div className="flex justify-center">
                 <Link
                   href={`/admin/wallpapers/${row.wallpaper.id}/edit`}

@@ -3,6 +3,8 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { pages } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { requireAdmin } from "@/lib/session";
+import { jsonError } from "@/lib/api-response";
 
 const schema = z.object({
   title: z.string().min(1).max(500).optional(),
@@ -31,6 +33,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
   const idNum = parseInt(id);
   if (isNaN(idNum)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   try {
+    await requireAdmin();
     const body = schema.parse(await req.json());
     const [row] = await db
       .update(pages)
@@ -40,7 +43,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
     if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(row);
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 400 });
+    return jsonError(err);
   }
 }
 
@@ -48,6 +51,11 @@ export async function DELETE(_req: NextRequest, { params }: Ctx) {
   const { id } = await params;
   const idNum = parseInt(id);
   if (isNaN(idNum)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
-  await db.delete(pages).where(eq(pages.id, idNum));
-  return NextResponse.json({ ok: true });
+  try {
+    await requireAdmin();
+    await db.delete(pages).where(eq(pages.id, idNum));
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return jsonError(err);
+  }
 }

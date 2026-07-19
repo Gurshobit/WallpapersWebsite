@@ -35,6 +35,12 @@ export function getTrustedOrigins(): string[] {
     origins.add(normalized);
     addWwwVariants(normalized, origins);
   }
+  // Allow native/mobile app origins (e.g. custom schemes like `myapp://` or a
+  // dev origin). Comma-separated in MOBILE_APP_ORIGINS.
+  for (const value of (process.env.MOBILE_APP_ORIGINS ?? "").split(",")) {
+    const trimmed = value.trim().replace(/\/$/, "");
+    if (trimmed) origins.add(trimmed);
+  }
   return [...origins];
 }
 

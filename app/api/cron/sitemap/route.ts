@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { SITE_URL } from "@/lib/routing";
 
 function verifyCron(req: NextRequest) {
-  const auth = req.headers.get("authorization");
   const secret = process.env.CRON_SECRET;
-  if (secret && auth !== `Bearer ${secret}`) return false;
-  return true;
+  if (!secret) return false; // fail closed when no secret is configured
+  return req.headers.get("authorization") === `Bearer ${secret}`;
 }
 
 export async function GET(req: NextRequest) {

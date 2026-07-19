@@ -168,11 +168,11 @@ export function AdminCollectionsPanel({
       </div>
 
       <div
-        className="rounded-2xl border overflow-hidden"
+        className="rounded-2xl border overflow-x-auto"
         style={{ background: "var(--surface)", borderColor: "var(--line)" }}
       >
         <div
-          className="grid grid-cols-[1fr_100px_80px_80px_90px_120px] gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wide border-b"
+          className="grid grid-cols-[1fr_100px_80px_80px_90px_120px] min-w-[720px] gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wide border-b"
           style={{ borderColor: "var(--line)", color: "var(--dim)" }}
         >
           <span>Collection</span>
@@ -185,7 +185,7 @@ export function AdminCollectionsPanel({
         {filtered.map((row) => (
           <div
             key={row.id}
-            className="grid grid-cols-[1fr_100px_80px_80px_90px_120px] gap-3 px-4 py-3.5 items-center border-b last:border-0"
+            className="grid grid-cols-[1fr_100px_80px_80px_90px_120px] min-w-[720px] gap-3 px-4 py-3.5 items-center border-b last:border-0"
             style={{ borderColor: "var(--line)" }}
           >
             <div>

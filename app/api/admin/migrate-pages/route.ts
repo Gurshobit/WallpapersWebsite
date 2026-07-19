@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sql } from "drizzle-orm";
+import { requireAdmin } from "@/lib/session";
+import { jsonError } from "@/lib/api-response";
 
 /** One-time migration endpoint — creates the pages table if missing. */
 export async function POST() {
   try {
+    await requireAdmin();
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS hdws_public.hdwallsite_pages (
         id              SERIAL PRIMARY KEY,
@@ -22,6 +25,6 @@ export async function POST() {
     `);
     return NextResponse.json({ ok: true, message: "Table created (or already existed)" });
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return jsonError(err, 500);
   }
 }

@@ -43,7 +43,7 @@ export default async function AdminAnalyticsPage() {
       <AdminPageHeader title="Analytics" subtitle="Engagement — downloads, views & likes" />
 
       {/* KPI row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {kpis.map((k) => (
           <div key={k.label} className="rounded-[15px] p-[18px]"
             style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
@@ -57,7 +57,7 @@ export default async function AdminAnalyticsPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         {/* Top downloaded */}
         <div className="rounded-[15px] p-5"
           style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>

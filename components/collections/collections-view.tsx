@@ -120,7 +120,7 @@ export function CollectionsView({
                 <path d="M19 11H5M19 11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2M19 11V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h1 className="font-bold text-[32px] tracking-[-0.8px] text-white" style={{ fontFamily: "var(--font-heading)" }}>
+            <h1 className="font-bold text-[clamp(24px,6vw,32px)] tracking-[-0.8px] text-white" style={{ fontFamily: "var(--font-heading)" }}>
               Collections
             </h1>
           </div>
@@ -199,8 +199,8 @@ export function CollectionsView({
               );
             })}
           </div>
-          <div className="flex items-center gap-2.5">
-            <div className="relative w-[220px]">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[220px]">
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -210,7 +210,7 @@ export function CollectionsView({
                 style={{ background: "var(--surface)", border: "1px solid var(--line)", color: "var(--text)" }}
               />
             </div>
-            <div className="flex gap-1 p-1 rounded-[11px]" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
+            <div className="flex gap-1 p-1 rounded-[11px] overflow-x-auto max-w-full" style={{ background: "var(--surface)", border: "1px solid var(--line)" }}>
               {([
                 ["saves", "Most Saved"],
                 ["views", "Most Viewed"],
@@ -220,7 +220,7 @@ export function CollectionsView({
                   key={k}
                   type="button"
                   onClick={() => updateParams({ sort: k })}
-                  className="h-7 px-3 rounded-lg text-xs font-semibold cursor-pointer"
+                  className="h-7 px-3 rounded-lg text-xs font-semibold cursor-pointer flex-none whitespace-nowrap"
                   style={{
                     background: sort === k ? "var(--surface2)" : "transparent",
                     color: sort === k ? "var(--text)" : "var(--muted)",
@@ -238,7 +238,7 @@ export function CollectionsView({
         </p>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-[18px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[18px]">
           {items.map((col) => (
             <CollectionCard key={col.id} col={col} prefix={prefix} onSave={() => void toggleSave(col.id)} />
           ))}

@@ -148,7 +148,7 @@ export default async function AdminOverviewPage() {
       />
 
       {/* KPI row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-[18px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-[18px]">
         {kpis.map(({ label, value, delta, href, highlight, icon: Icon, iconBg, iconColor }) => {
           const card = (
             <div
@@ -202,7 +202,7 @@ export default async function AdminOverviewPage() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4 mb-[18px]">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4 mb-[18px]">
         <div
           className="rounded-[15px] p-5"
           style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
@@ -293,7 +293,7 @@ export default async function AdminOverviewPage() {
       </div>
 
       {/* Activity + storage */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4">
         <div
           className="rounded-[15px] p-5"
           style={{ background: "var(--surface)", border: "1px solid var(--line)" }}

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/session";
 import { db } from "@/lib/db";
 import { siteConfigs } from "@/lib/db/schema";
+import { jsonError } from "@/lib/api-response";
 
 const patchSchema = z.object({
   configs: z.record(z.string(), z.string()),
@@ -25,6 +26,6 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 400 });
+    return jsonError(err);
   }
 }

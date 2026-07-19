@@ -133,8 +133,13 @@ export function PreviewEditModal({ file, resolution, initialCrop, onApply, onClo
     const maxOffX = Math.max(0, rendW - canvasW);
     const maxOffY = Math.max(0, rendH - canvasH);
 
-    const dx = e.clientX - dragRef.current.startX;
-    const dy = e.clientY - dragRef.current.startY;
+    // Scale screen-pixel movement into canvas-internal space (the canvas may be
+    // rendered smaller than canvasW on narrow screens).
+    const rect = e.currentTarget.getBoundingClientRect();
+    const sx = rect.width ? canvasW / rect.width : 1;
+    const sy = rect.height ? canvasH / rect.height : 1;
+    const dx = (e.clientX - dragRef.current.startX) * sx;
+    const dy = (e.clientY - dragRef.current.startY) * sy;
 
     const newX = maxOffX > 0 ? Math.max(0, Math.min(100, dragRef.current.startCropX - (dx / maxOffX) * 100)) : 50;
     const newY = maxOffY > 0 ? Math.max(0, Math.min(100, dragRef.current.startCropY - (dy / maxOffY) * 100)) : 50;
@@ -167,8 +172,11 @@ export function PreviewEditModal({ file, resolution, initialCrop, onApply, onClo
     const maxOffX = Math.max(0, rendW - canvasW);
     const maxOffY = Math.max(0, rendH - canvasH);
 
-    const dx = t.clientX - dragRef.current.startX;
-    const dy = t.clientY - dragRef.current.startY;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const sx = rect.width ? canvasW / rect.width : 1;
+    const sy = rect.height ? canvasH / rect.height : 1;
+    const dx = (t.clientX - dragRef.current.startX) * sx;
+    const dy = (t.clientY - dragRef.current.startY) * sy;
 
     const newX = maxOffX > 0 ? Math.max(0, Math.min(100, dragRef.current.startCropX - (dx / maxOffX) * 100)) : 50;
     const newY = maxOffY > 0 ? Math.max(0, Math.min(100, dragRef.current.startCropY - (dy / maxOffY) * 100)) : 50;
@@ -231,7 +239,7 @@ export function PreviewEditModal({ file, resolution, initialCrop, onApply, onClo
               {!loaded && (
                 <div
                   className="flex items-center justify-center rounded-[8px]"
-                  style={{ width: Math.min(canvasW, 520), height: Math.round(Math.min(canvasW, 520) / targetAR), background: "var(--surface2)" }}>
+                  style={{ width: Math.min(canvasW, 520), maxWidth: "100%", aspectRatio: `${resW} / ${resH}`, height: "auto", background: "var(--surface2)" }}>
                   <span className="w-6 h-6 border-2 rounded-full"
                     style={{ borderColor: "rgba(34,211,238,.2)", borderTopColor: "#22d3ee", animation: "spin .7s linear infinite" }} />
                 </div>
@@ -242,7 +250,9 @@ export function PreviewEditModal({ file, resolution, initialCrop, onApply, onClo
                 height={Math.round(Math.min(canvasW, 520) / targetAR) * 2}
                 style={{
                   width: Math.min(canvasW, 520),
-                  height: Math.round(Math.min(canvasW, 520) / targetAR),
+                  maxWidth: "100%",
+                  aspectRatio: `${resW} / ${resH}`,
+                  height: "auto",
                   borderRadius: 8,
                   cursor: "grab",
                   display: loaded ? "block" : "none",

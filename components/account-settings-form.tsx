@@ -81,7 +81,7 @@ export function AccountSettingsForm({
 
   return (
     <div className="min-h-screen pb-20" style={{ background: "var(--bg)" }}>
-      <div className="max-w-[860px] mx-auto px-7 pt-7">
+      <div className="max-w-[860px] mx-auto px-4 sm:px-7 pt-7">
         <Link
           href={`${prefix}/u/${handle}`}
           className="inline-flex items-center gap-[7px] text-[13px] font-semibold mb-[18px] no-underline transition-colors hover:text-[var(--text)]"
