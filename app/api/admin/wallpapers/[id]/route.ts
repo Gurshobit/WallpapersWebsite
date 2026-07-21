@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/session";
+import { requireStaff } from "@/lib/session";
 import {
   getAdminWallpaperDetail,
   updateAdminWallpaper,
@@ -12,7 +12,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin();
+    await requireStaff();
     const { id } = await params;
     const wallpaperId = parseInt(id, 10);
     if (Number.isNaN(wallpaperId)) {
@@ -61,7 +61,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAdmin();
+    await requireStaff();
     const { id } = await params;
     const wallpaperId = parseInt(id, 10);
     if (Number.isNaN(wallpaperId)) {

@@ -22,9 +22,13 @@ function NavIcon({ d }: { d: string }) {
 export function Header({
   canRegister = true,
   canSubmit = true,
+  isStaff = false,
+  isAdmin = false,
 }: {
   canRegister?: boolean;
   canSubmit?: boolean;
+  isStaff?: boolean;
+  isAdmin?: boolean;
 }) {
   const t = useTranslations("common");
   const locale = useLocale();
@@ -32,6 +36,8 @@ export function Header({
   const { data: session } = useSession();
   const prefix = locale === "en" ? "" : `/${locale}`;
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Admin routes are not localized; moderators land on Moderation.
+  const adminHref = isAdmin ? "/admin" : "/admin/moderation";
 
   // Show the filter button only on browse/listing pages
   const cleanPath = pathname.replace(/^\/(ar|de|es|fr|hi|ja|pt)/, "") || "/";
@@ -124,6 +130,19 @@ export function Header({
 
           {/* Desktop right actions */}
           <div className="hidden md:flex items-center gap-2 lg:gap-2.5 flex-none">
+            {isStaff && (
+              <Link
+                href={adminHref}
+                title="Admin Panel"
+                className="flex-none inline-flex items-center gap-1.5 h-9 px-2.5 lg:px-3 rounded-[10px] text-sm font-semibold no-underline transition-colors hover:bg-[var(--surface2)]"
+                style={{ background: "var(--surface)", border: "1px solid var(--line2)", color: "var(--text)" }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                </svg>
+                <span className="hidden lg:inline">Admin</span>
+              </Link>
+            )}
             <Link href={canSubmit ? `${prefix}/upload` : `${prefix}/community`} title={t("upload")} className="hd-header-upload-btn hd-btn-primary text-sm px-3 py-2">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
                 <path d="M12 16V4m0 0 5 5m-5-5L7 9" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -255,6 +274,20 @@ export function Header({
                 {item.label}
               </Link>
             ))}
+            {isStaff && (
+              <Link href={adminHref}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-[14px] py-[13px] rounded-[12px] text-[15px] font-semibold transition-colors no-underline"
+                style={{ background: "var(--surface)", color: "var(--text2)", border: "1px solid var(--line)" }}
+              >
+                <span className="w-8 h-8 rounded-[9px] flex items-center justify-center flex-none" style={{ background: "var(--surface2)" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                Admin Panel
+              </Link>
+            )}
           </div>
 
           <div style={{ height: 1, background: "var(--line)" }} />

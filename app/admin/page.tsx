@@ -10,7 +10,7 @@ import {
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { formatCount, formatBytes, formatPercentChange } from "@/lib/format";
 import { resolveMediaUrl } from "@/lib/media";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser, guardAdminOnlyPage } from "@/lib/session";
 import {
   IconWallpapers,
   IconUsers,
@@ -48,6 +48,7 @@ const ACTIVITY_META = {
 } as const;
 
 export default async function AdminOverviewPage() {
+  await guardAdminOnlyPage();
   const [stats, weekly, topCategories, storage, activity, user] = await Promise.all([
     getDashboardKpis(),
     getWeeklyDownloadChart(),
@@ -103,7 +104,7 @@ export default async function AdminOverviewPage() {
 
   return (
     <div
-      className="px-[30px] py-[26px] pb-[50px]"
+      className="px-4 sm:px-[30px] py-[26px] pb-[50px]"
       style={{ animation: "fadeUp .35s ease both" }}
     >
       <AdminPageHeader

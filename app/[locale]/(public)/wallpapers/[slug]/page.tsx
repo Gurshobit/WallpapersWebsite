@@ -15,6 +15,7 @@ import {
 import { getMemberSettings } from "@/lib/member-settings";
 import { getCurrentUser } from "@/lib/session";
 import { RichContent } from "@/components/rich-content";
+import { AdSlot } from "@/components/ad-slot";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { stripHtml } from "@/lib/html-text";
 
@@ -159,10 +160,14 @@ export default async function WallpaperDetailPage({
                 </div>
               </div>
             )}
+
+            {/* Sidebar ad (renders only when an active in-window slot exists) */}
+            <AdSlot placement="sidebar_300x250" variant="sidebar" className="mb-5" />
           </div>
 
           {/* ── Detail panel — col 2 on desktop (spans both rows), order 3 on mobile ── */}
           <WallpaperDetailPanel
+            wallpaperId={wallpaper.id}
             wallpaperUuid={wallpaper.uuid}
             slug={slug}
             title={wallpaper.title}

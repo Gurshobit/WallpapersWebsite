@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { resolveMediaUrl } from "@/lib/media";
 import { wallpaperDownloadPath } from "@/lib/wallpaper-urls";
+import { useWallpaperInteractions } from "@/components/user-interactions-provider";
 
 type ShortlistItem = {
   id: number;
@@ -23,9 +24,11 @@ export function ShortlistGrid({ items }: { items: ShortlistItem[] }) {
   const t = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
+  const interactions = useWallpaperInteractions();
   const prefix = locale === "en" ? "" : `/${locale}`;
 
   async function remove(id: number) {
+    interactions.setShortlisted(id, false);
     await fetch("/api/shortlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

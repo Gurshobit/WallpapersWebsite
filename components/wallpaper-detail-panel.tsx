@@ -9,6 +9,7 @@ import { formatCount } from "@/lib/format";
 import { wallpaperDownloadPath } from "@/lib/wallpaper-urls";
 import { DownloadModal } from "./wallpaper-card";
 import { RichContent } from "./rich-content";
+import { useWallpaperInteractions } from "./user-interactions-provider";
 
 // ── resolution types ──────────────────────────────────────────────────────────
 
@@ -200,6 +201,7 @@ function FormatPickerModal({
 }
 
 interface DetailPanelProps {
+  wallpaperId: number;
   wallpaperUuid: string;
   slug: string;
   title: string;
@@ -231,9 +233,14 @@ type Tab = "about" | "share" | "resolutions";
 
 export function WallpaperDetailPanel(props: DetailPanelProps) {
   const t = useTranslations("common");
+  const interactions = useWallpaperInteractions();
   const [tab, setTab] = useState<Tab>("about");
-  const [liked, setLiked] = useState<boolean | null>(null);
-  const [shortlisted, setShortlisted] = useState(false);
+  const [liked, setLiked] = useState<boolean | null>(() =>
+    interactions.getRating(props.wallpaperId)
+  );
+  const [shortlisted, setShortlisted] = useState(() =>
+    interactions.isShortlisted(props.wallpaperId)
+  );
   const [showDownload, setShowDownload] = useState(false);
   const [copyDone, setCopyDone] = useState(false);
   const [embedCopied, setEmbedCopied] = useState(false);
@@ -260,25 +267,29 @@ export function WallpaperDetailPanel(props: DetailPanelProps) {
   }, [tab, resGroups, props.wallpaperUuid]);
 
   async function handleLike(value: boolean) {
-    if (liked === value) { setLiked(null); return; }
-    setLiked(value);
+    const next = liked === value ? null : value;
+    setLiked(next);
+    interactions.setRating(props.wallpaperId, next);
     await fetch("/api/likes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ wallpaperSlug: props.slug, like: value }),
+      body: JSON.stringify({ wallpaperId: props.wallpaperId, like: value }),
     });
   }
 
   async function handleShortlist() {
-    setShortlisted((v) => !v);
-    const [res] = await Promise.all([
-      fetch("/api/shortlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallpaperSlug: props.slug }),
-      }),
-    ]);
-    if (!res.ok) setShortlisted((v) => !v); // revert on error
+    const next = !shortlisted;
+    setShortlisted(next);
+    interactions.setShortlisted(props.wallpaperId, next);
+    const res = await fetch("/api/shortlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wallpaperId: props.wallpaperId }),
+    });
+    if (!res.ok) {
+      setShortlisted(!next); // revert on error
+      interactions.setShortlisted(props.wallpaperId, !next);
+    }
   }
 
   function copyLink() {

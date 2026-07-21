@@ -3,10 +3,12 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminCollectionsPanel } from "@/components/admin/admin-collections-panel";
 import { adminListCollections } from "@/lib/db/queries/collections";
 import { listCategories } from "@/lib/db/queries/admin";
+import { guardAdminOnlyPage } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCollectionsPage() {
+  await guardAdminOnlyPage();
   const [items, categories] = await Promise.all([
     adminListCollections(),
     listCategories(),

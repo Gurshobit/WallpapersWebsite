@@ -10,6 +10,7 @@ import {
   AdminSettingsEmails,
   AdminSettingsLinks,
 } from "@/components/admin/admin-settings-section";
+import { guardAdminOnlyPage } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,7 @@ export default async function AdminSettingsPage({
 }: {
   searchParams: Promise<{ section?: string }>;
 }) {
+  await guardAdminOnlyPage();
   const sp = await searchParams;
   const section = sp.section ?? "general";
 

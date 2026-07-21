@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { guardAdminOnlyPage } from "@/lib/session";
 
-export default function AdminWallpaperDefaultsPage() {
+export default async function AdminWallpaperDefaultsPage() {
+  await guardAdminOnlyPage();
   return (
     <AdminShell>
       <AdminPageHeader

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { moderateWallpaper } from "@/lib/db/queries/admin";
-import { requireAdmin } from "@/lib/session";
+import { requireStaff } from "@/lib/session";
 
 const schema = z.object({
   wallpaperId: z.number(),
@@ -11,7 +11,7 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const admin = await requireAdmin();
+    const admin = await requireStaff();
     const body = schema.parse(await req.json());
     await moderateWallpaper(body.wallpaperId, body.action, admin.id, body.notes);
     return NextResponse.json({ success: true });

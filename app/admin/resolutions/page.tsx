@@ -2,10 +2,12 @@ import { listResolutionTypes, listResolutions } from "@/lib/db/queries/admin";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminResolutionsManager } from "@/components/admin/admin-resolutions-manager";
+import { guardAdminOnlyPage } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminResolutionsPage() {
+  await guardAdminOnlyPage();
   const [resolutionTypes, resolutions] = await Promise.all([
     listResolutionTypes(),
     listResolutions(),

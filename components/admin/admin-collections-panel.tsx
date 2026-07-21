@@ -172,7 +172,7 @@ export function AdminCollectionsPanel({
         style={{ background: "var(--surface)", borderColor: "var(--line)" }}
       >
         <div
-          className="grid grid-cols-[1fr_100px_80px_80px_90px_120px] min-w-[720px] gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wide border-b"
+          className="hidden md:grid grid-cols-[1fr_100px_80px_80px_90px_120px] min-w-[720px] gap-3 px-4 py-3 text-[11px] font-bold uppercase tracking-wide border-b"
           style={{ borderColor: "var(--line)", color: "var(--dim)" }}
         >
           <span>Collection</span>
@@ -185,7 +185,7 @@ export function AdminCollectionsPanel({
         {filtered.map((row) => (
           <div
             key={row.id}
-            className="grid grid-cols-[1fr_100px_80px_80px_90px_120px] min-w-[720px] gap-3 px-4 py-3.5 items-center border-b last:border-0"
+            className="grid grid-cols-1 md:grid-cols-[1fr_100px_80px_80px_90px_120px] md:min-w-[720px] gap-2 md:gap-3 px-4 py-3.5 md:items-center border-b last:border-0"
             style={{ borderColor: "var(--line)" }}
           >
             <div>
@@ -195,23 +195,33 @@ export function AdminCollectionsPanel({
               </div>
             </div>
             <span className="text-[12.5px]" style={{ color: "var(--text3)" }}>
+              <span className="md:hidden font-semibold uppercase text-[10px] tracking-wide mr-1.5" style={{ color: "var(--dim)" }}>Category</span>
               {row.category ?? "—"}
             </span>
-            <span className="text-[13px] font-semibold">{row.wallpaperCount}</span>
-            <span className="text-[13px] font-semibold">{row.saveCount}</span>
-            <button
-              type="button"
-              onClick={() => toggleFeatured(row)}
-              aria-pressed={row.featured}
-              className="relative w-[42px] h-6 rounded-full border-none cursor-pointer flex-none transition-colors"
-              style={{ background: row.featured ? "#30a46c" : "var(--track)" }}
-            >
-              <span
-                className="absolute top-[2px] w-5 h-5 rounded-full bg-white transition-all"
-                style={{ left: row.featured ? 20 : 2, boxShadow: "0 1px 3px rgba(0,0,0,.3)" }}
-              />
-            </button>
-            <div className="flex gap-2 justify-end">
+            <span className="text-[13px] font-semibold">
+              <span className="md:hidden font-semibold uppercase text-[10px] tracking-wide mr-1.5" style={{ color: "var(--dim)" }}>Items</span>
+              {row.wallpaperCount}
+            </span>
+            <span className="text-[13px] font-semibold">
+              <span className="md:hidden font-semibold uppercase text-[10px] tracking-wide mr-1.5" style={{ color: "var(--dim)" }}>Saves</span>
+              {row.saveCount}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="md:hidden font-semibold uppercase text-[10px] tracking-wide" style={{ color: "var(--dim)" }}>Featured</span>
+              <button
+                type="button"
+                onClick={() => toggleFeatured(row)}
+                aria-pressed={row.featured}
+                className="relative w-[42px] h-6 rounded-full border-none cursor-pointer flex-none transition-colors"
+                style={{ background: row.featured ? "#30a46c" : "var(--track)" }}
+              >
+                <span
+                  className="absolute top-[2px] w-5 h-5 rounded-full bg-white transition-all"
+                  style={{ left: row.featured ? 20 : 2, boxShadow: "0 1px 3px rgba(0,0,0,.3)" }}
+                />
+              </button>
+            </div>
+            <div className="flex gap-2 md:justify-end pt-1 md:pt-0">
               <button
                 type="button"
                 onClick={() => openEdit(row)}

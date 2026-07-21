@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { getEngagementStats, getRecentActivity } from "@/lib/db/queries/admin";
+import { guardAdminOnlyPage } from "@/lib/session";
 import { formatCount } from "@/lib/format";
 import { resolveMediaUrl } from "@/lib/media";
 
@@ -26,6 +27,7 @@ function timeAgo(date: Date | null) {
 }
 
 export default async function AdminAnalyticsPage() {
+  await guardAdminOnlyPage();
   const [stats, activity] = await Promise.all([
     getEngagementStats(),
     getRecentActivity(50),

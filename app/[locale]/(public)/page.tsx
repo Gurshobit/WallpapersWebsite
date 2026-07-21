@@ -97,7 +97,10 @@ export default async function HomePage({
           </div>
 
           <AdSlot slug="header_728x90" className="mb-[22px] w-full" />
-          <WallpaperGrid items={result.items} />
+          <WallpaperGrid
+            items={result.items}
+            interleavedAd={<AdSlot placement="inline_grid" />}
+          />
           <AdSlot slug="header_728x90" className="mt-[22px] w-full" />
 
           <Pagination

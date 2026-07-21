@@ -36,17 +36,24 @@ const NAV: {
 
 interface AdminSidebarProps {
   pendingCount?: number;
+  role?: number;
 }
+
+// Moderators (roleId 3) only get these sections.
+const MODERATOR_HREFS = new Set(["/admin/moderation", "/admin/wallpapers"]);
 
 function SidebarInner({
   pendingCount,
   pathname,
   onNavigate,
+  role,
 }: {
   pendingCount: number;
   pathname: string;
   onNavigate?: () => void;
+  role?: number;
 }) {
+  const items = role === 3 ? NAV.filter((n) => MODERATOR_HREFS.has(n.href)) : NAV;
   return (
     <>
       <div className="flex items-center gap-2.5 px-2 pb-5">
@@ -59,7 +66,7 @@ function SidebarInner({
       </div>
 
       <nav className="flex flex-col gap-[3px] flex-1 overflow-y-auto">
-        {NAV.map(({ href, label, icon, badgeKey, color, bg }) => {
+        {items.map(({ href, label, icon, badgeKey, color, bg }) => {
           const active = pathname === href ||
             (href === "/admin/settings" && pathname.startsWith("/admin/settings"));
           const badge = badgeKey === "pending" ? pendingCount : 0;
@@ -118,7 +125,7 @@ function SidebarInner({
   );
 }
 
-export function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
+export function AdminSidebar({ pendingCount = 0, role }: AdminSidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -144,7 +151,7 @@ export function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
         className="hidden md:flex w-[200px] lg:w-[236px] flex-none sticky top-0 h-screen flex-col py-[18px] px-[14px] border-r"
         style={{ background: "var(--bg2)", borderColor: "var(--line)" }}
       >
-        <SidebarInner pendingCount={pendingCount} pathname={pathname} />
+        <SidebarInner pendingCount={pendingCount} pathname={pathname} role={role} />
       </aside>
 
       {/* Mobile top bar */}
@@ -196,6 +203,7 @@ export function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
               pendingCount={pendingCount}
               pathname={pathname}
               onNavigate={() => setOpen(false)}
+              role={role}
             />
           </aside>
         </div>

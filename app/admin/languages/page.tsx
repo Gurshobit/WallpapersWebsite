@@ -3,6 +3,7 @@ import { join } from "path";
 import { listLanguages } from "@/lib/db/queries/admin";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { guardAdminOnlyPage } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,7 @@ function getTranslationPct(code: string, enKeys: string[]): number {
 }
 
 export default async function AdminLanguagesPage() {
+  await guardAdminOnlyPage();
   const langs = await listLanguages();
   const enMessages = JSON.parse(
     readFileSync(join(process.cwd(), "messages/en.json"), "utf-8")

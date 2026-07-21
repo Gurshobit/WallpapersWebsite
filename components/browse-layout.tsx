@@ -121,7 +121,12 @@ export function BrowseLayout({
 
         <AdSlot slug="header_728x90" className="mb-[22px] w-full" />
 
-        <WallpaperGrid items={items} searchQuery={searchQuery} clearSearchHref={searchQuery ? basePath : undefined} />
+        <WallpaperGrid
+          items={items}
+          searchQuery={searchQuery}
+          clearSearchHref={searchQuery ? basePath : undefined}
+          interleavedAd={<AdSlot placement="inline_grid" />}
+        />
 
         <AdSlot slug="header_728x90" className="mt-[22px] w-full" />
 

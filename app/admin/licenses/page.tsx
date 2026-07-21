@@ -2,10 +2,12 @@ import { listLicenses } from "@/lib/db/queries/admin";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminLicensesManager } from "@/components/admin/admin-licenses-manager";
+import { guardAdminOnlyPage } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminLicensesPage() {
+  await guardAdminOnlyPage();
   const licenses = await listLicenses();
 
   return (

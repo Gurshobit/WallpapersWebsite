@@ -3,10 +3,12 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminCommunityPanel } from "@/components/admin/admin-community-panel";
 import { getCommunityFeed, listChallenges } from "@/lib/db/queries/community";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { guardAdminOnlyPage } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCommunityPage() {
+  await guardAdminOnlyPage();
   const [feed, challenges] = await Promise.all([
     getCommunityFeed(30),
     listChallenges(false),

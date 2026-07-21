@@ -696,12 +696,21 @@ export const adSlots = hdwsPublic.table(t("ad_slots"), {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }).notNull().unique(),
-  placement: adPlacementEnum("placement"),
+  placement: varchar("placement", { length: 100 }),
   width: integer("width"),
   height: integer("height"),
   content: text("content"),
+  imageUrl: text("image_url"),
+  linkUrl: text("link_url"),
+  priority: integer("priority").default(0),
+  startsAt: timestamp("starts_at"),
+  endsAt: timestamp("ends_at"),
   active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export type AdSlot = typeof adSlots.$inferSelect;
 
 export const siteConfigs = hdwsPublic.table(t("site_configs"), {
   id: serial("id").primaryKey(),

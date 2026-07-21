@@ -39,7 +39,7 @@
     "nanoid": "^5.1.15",
     "next": "^15.2.4",
     "next-intl": "^4.1.0",
-    "prettier": "^3.9.5",
+    "prettier": "3.8.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "resend": "^4.1.2",

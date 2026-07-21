@@ -88,9 +88,9 @@ export function AdminLicensesManager({ licenses: initial }: { licenses: License[
         </div>
       )}
 
-      <div className="flex gap-5 items-start">
+      <div className="flex flex-col lg:flex-row gap-5 items-start">
         {/* license list */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 w-full">
           {list.length === 0 ? (
             <div
               className="rounded-2xl p-10 text-center text-sm"
@@ -153,7 +153,7 @@ export function AdminLicensesManager({ licenses: initial }: { licenses: License[
 
         {/* add sidebar */}
         <aside
-          className="w-[300px] flex-none rounded-[15px] p-[18px] sticky top-5"
+          className="w-full lg:w-[300px] flex-none rounded-[15px] p-[18px] lg:sticky lg:top-5"
           style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
         >
           <div className="font-bold text-base mb-[5px]" style={{ fontFamily: "var(--font-heading)" }}>

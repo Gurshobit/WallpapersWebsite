@@ -579,6 +579,23 @@ export async function getLikedWallpaperIds(userId: number) {
   return rows.map((r) => r.wallpaperId);
 }
 
+/** All of a user's ratings (likes and dislikes) for seeding client UI. */
+export async function getUserRatings(userId: number) {
+  return db
+    .select({ wallpaperId: ratings.wallpaperId, iLike: ratings.iLike })
+    .from(ratings)
+    .where(eq(ratings.userId, userId));
+}
+
+/** IDs of wallpapers the user has shortlisted, for seeding client UI. */
+export async function getShortlistedWallpaperIds(userId: number) {
+  const rows = await db
+    .select({ wallpaperId: shortlists.wallpaperId })
+    .from(shortlists)
+    .where(eq(shortlists.userId, userId));
+  return rows.map((r) => r.wallpaperId);
+}
+
 export async function getAllActiveSlugs() {
   return db
     .select({ slug: wallpapers.slug, dateAdded: wallpapers.dateAdded })

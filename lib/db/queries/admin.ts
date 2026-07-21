@@ -1,4 +1,4 @@
-import { eq, desc, count, and, sql, asc, gte, lt } from "drizzle-orm";
+import { eq, desc, count, and, or, sql, asc, gte, lt, lte, isNull } from "drizzle-orm";
 import { db } from "../index";
 import {
   wallpapers,
@@ -336,7 +336,67 @@ export async function listLanguages() {
 }
 
 export async function listAdSlots() {
-  return db.select().from(adSlots).orderBy(adSlots.slug);
+  return db.select().from(adSlots).orderBy(desc(adSlots.priority), adSlots.slug);
+}
+
+type AdSlotInsert = typeof adSlots.$inferInsert;
+
+export async function getAdSlotBySlug(slug: string) {
+  const [row] = await db
+    .select()
+    .from(adSlots)
+    .where(eq(adSlots.slug, slug))
+    .limit(1);
+  return row ?? null;
+}
+
+export async function getAdSlotById(id: number) {
+  const [row] = await db
+    .select()
+    .from(adSlots)
+    .where(eq(adSlots.id, id))
+    .limit(1);
+  return row ?? null;
+}
+
+export async function createAdSlot(data: AdSlotInsert) {
+  const [row] = await db.insert(adSlots).values(data).returning();
+  return row;
+}
+
+export async function updateAdSlot(
+  id: number,
+  data: Partial<AdSlotInsert>
+) {
+  const [row] = await db
+    .update(adSlots)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(adSlots.id, id))
+    .returning();
+  return row;
+}
+
+export async function deleteAdSlot(id: number) {
+  await db.delete(adSlots).where(eq(adSlots.id, id));
+}
+
+/** Highest-priority active slot that is currently within its schedule window. */
+export async function getActiveAdSlotByPlacement(placement: string) {
+  const now = new Date();
+  const [row] = await db
+    .select()
+    .from(adSlots)
+    .where(
+      and(
+        eq(adSlots.placement, placement),
+        eq(adSlots.active, true),
+        or(isNull(adSlots.startsAt), lte(adSlots.startsAt, now)),
+        or(isNull(adSlots.endsAt), gte(adSlots.endsAt, now))
+      )
+    )
+    .orderBy(desc(adSlots.priority))
+    .limit(1);
+  return row ?? null;
 }
 
 export async function listCategories() {

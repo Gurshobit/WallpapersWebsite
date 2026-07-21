@@ -4,9 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { formatCount } from "@/lib/format";
 import { wallpaperDownloadPath } from "@/lib/wallpaper-urls";
+import { useWallpaperInteractions } from "@/components/user-interactions-provider";
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -460,22 +461,31 @@ export function WallpaperCard({ wallpaper }: WallpaperCardProps) {
   const locale = useLocale();
   const t = useTranslations("common");
   const prefix = locale === "en" ? "" : `/${locale}`;
+  const interactions = useWallpaperInteractions();
 
   const [hovered, setHovered] = useState(false);
-  const [liked, setLiked] = useState<boolean | null>(null);
-  const [shortlisted, setShortlisted] = useState(false);
+  const [liked, setLiked] = useState<boolean | null>(() =>
+    interactions.getRating(wallpaper.id)
+  );
+  const [shortlisted, setShortlisted] = useState(() =>
+    interactions.isShortlisted(wallpaper.id)
+  );
   const [showDownload, setShowDownload] = useState(false);
 
   const author = wallpaper.authorName ?? wallpaper.username ?? "Creator";
 
   async function handleLike(value: boolean) {
-    if (liked === value) return;
-    setLiked(value);
+    // Toggling the same value clears the rating (matches the API's behavior).
+    const next = liked === value ? null : value;
+    setLiked(next);
+    interactions.setRating(wallpaper.id, next);
     await likeWallpaper(wallpaper.id, value);
   }
 
   async function handleShortlist() {
-    setShortlisted((v) => !v);
+    const next = !shortlisted;
+    setShortlisted(next);
+    interactions.setShortlisted(wallpaper.id, next);
     await toggleShortlist(wallpaper.id);
   }
 
@@ -562,19 +572,19 @@ export function WallpaperCard({ wallpaper }: WallpaperCardProps) {
             </button>
 
             {/* like */}
-            <ActionBtn active={liked === true} activeColor="#ff2e63" title="Like"
+            <ActionBtn active={liked === true} activeColor="#ff2e63" activeBg="rgba(255,46,99,.20)" title="Like"
               onClick={() => handleLike(true)}>
               <IconHeart filled={liked === true} />
             </ActionBtn>
 
             {/* dislike */}
-            <ActionBtn active={liked === false} activeColor="rgba(255,255,255,.3)" title="Dislike"
+            <ActionBtn active={liked === false} activeColor="rgba(255,255,255,.9)" activeBg="rgba(255,255,255,.16)" title="Dislike"
               onClick={() => handleLike(false)}>
               <IconThumbDown filled={liked === false} />
             </ActionBtn>
 
             {/* shortlist */}
-            <ActionBtn active={shortlisted} activeColor="#fbbf24" title={t("shortlist")}
+            <ActionBtn active={shortlisted} activeColor="#fbbf24" activeBg="rgba(251,191,36,.20)" title={t("shortlist")}
               onClick={handleShortlist}>
               <IconBookmark filled={shortlisted} />
             </ActionBtn>
@@ -615,12 +625,15 @@ function ActionBtn({
   children,
   active,
   activeColor,
+  activeBg,
   title,
   onClick,
 }: {
   children: React.ReactNode;
   active: boolean;
   activeColor: string;
+  /** Subtle tinted background used when active (keeps the icon visible). */
+  activeBg: string;
   title: string;
   onClick: () => void;
 }) {
@@ -631,10 +644,10 @@ function ActionBtn({
       onClick={(e) => { e.stopPropagation(); onClick(); }}
       className="w-[34px] h-[34px] flex-none flex items-center justify-center rounded-[9px] cursor-pointer transition-all"
       style={{
-        background: active ? activeColor : "rgba(255,255,255,.1)",
-        border: `1px solid ${active ? "transparent" : "rgba(255,255,255,.18)"}`,
-        color: active ? "#fff" : "rgba(255,255,255,.8)",
-        transform: active ? "scale(1.08)" : "scale(1)",
+        background: active ? activeBg : "rgba(255,255,255,.1)",
+        border: `1px solid ${active ? activeColor : "rgba(255,255,255,.18)"}`,
+        color: active ? activeColor : "rgba(255,255,255,.8)",
+        transform: active ? "scale(1.05)" : "scale(1)",
       }}
     >
       {children}
@@ -697,9 +710,19 @@ interface WallpaperGridProps {
   items: WallpaperItem[];
   searchQuery?: string;
   clearSearchHref?: string;
+  /** Optional server-rendered ad node to interleave into the grid. */
+  interleavedAd?: React.ReactNode;
+  /** Render `interleavedAd` as a grid cell after this many cards (default 8). */
+  adAfter?: number;
 }
 
-export function WallpaperGrid({ items, searchQuery, clearSearchHref }: WallpaperGridProps) {
+export function WallpaperGrid({
+  items,
+  searchQuery,
+  clearSearchHref,
+  interleavedAd,
+  adAfter = 8,
+}: WallpaperGridProps) {
   const t = useTranslations("common");
 
   if (items.length === 0) {
@@ -727,10 +750,17 @@ export function WallpaperGrid({ items, searchQuery, clearSearchHref }: Wallpaper
     );
   }
 
+  const showAd = interleavedAd && items.length > adAfter;
+
   return (
     <div className="hd-card-grid">
-      {items.map((wall) => (
-        <WallpaperCard key={wall.id} wallpaper={wall} />
+      {items.map((wall, i) => (
+        <Fragment key={wall.id}>
+          <WallpaperCard wallpaper={wall} />
+          {showAd && i === adAfter - 1 && (
+            <div className="min-w-0">{interleavedAd}</div>
+          )}
+        </Fragment>
       ))}
     </div>
   );

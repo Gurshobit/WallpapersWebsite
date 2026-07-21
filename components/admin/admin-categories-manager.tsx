@@ -594,9 +594,9 @@ export function AdminCategoriesManager({ categories: initial }: { categories: Ca
         </div>
       )}
 
-      <div className="flex gap-5 items-start">
+      <div className="flex flex-col lg:flex-row gap-5 items-start">
         {/* tree */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 w-full">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleRootDragEnd}>
             <SortableContext items={tree.map((n) => n.id)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-[8px]">
@@ -626,7 +626,7 @@ export function AdminCategoriesManager({ categories: initial }: { categories: Ca
 
         {/* sidebar: add root */}
         <aside
-          className="w-[290px] flex-none rounded-[15px] p-[18px] sticky top-5"
+          className="w-full lg:w-[290px] flex-none rounded-[15px] p-[18px] lg:sticky lg:top-5"
           style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
         >
           <div className="font-bold text-base mb-[5px]" style={{ fontFamily: "var(--font-heading)" }}>New category</div>
